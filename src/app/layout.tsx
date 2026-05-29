@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import MenuFixer from "./MenuFixer";
 
 export const metadata: Metadata = {
   title: "在 5 分钟内免费添加在线商店",
@@ -32,6 +33,7 @@ export default function RootLayout({
         `}</style>
       </head>
       <body id="p-32564" className="index-EW19">
+        <MenuFixer />
         {children}
       </body>
     </html>
