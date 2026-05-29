@@ -1,8 +1,69 @@
+"use client";
+import { useEffect } from 'react';
 import React from "react";
 import Link from "next/link";
 import MenuFixer from "../../MenuFixer";
 
 export default function SellPage() {
+
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('hpc-slider__slide--active');
+          // also add animated class for general elements if needed
+          if(entry.target.classList.contains('hpc-animate')) entry.target.classList.add('hpc-animate--animated');
+        } else {
+          // If you want them to animate again when scrolling up/down
+          // entry.target.classList.remove('hpc-slider__slide--active');
+        }
+      });
+    }, { threshold: 0.3 });
+
+    document.querySelectorAll('.hpc-slider__slide, .hpc-animate').forEach(el => observer.observe(el));
+    
+    // Add slick carousel for calypso-showcase if missing
+    if (document.querySelector('.calypso-showcase')) {
+      if (!document.getElementById('slick-js')) {
+        const script = document.createElement('script');
+        script.id = 'slick-js';
+        script.src = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.js';
+        const jq = document.createElement('script');
+        jq.src = 'https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js';
+        jq.onload = () => document.body.appendChild(script);
+        script.onload = () => {
+          // Initialize slick
+          // @ts-ignore
+          window.jQuery('.calypso-showcase').slick({
+             swipe: true,
+             slidesToShow: 1,
+             infinite: false,
+             initialSlide: 1,
+             centerMode: true,
+             focusOnSelect: true,
+             centerPadding: '60px',
+             dots: true,
+             arrows: false,
+             mobileFirst: true,
+             responsive: [{
+               breakpoint: 991,
+               settings: { fade: true, infinite: true, dots: false, arrows: true }
+             }]
+          });
+        };
+        document.body.appendChild(jq);
+        
+        // Also add slick CSS
+        const css1 = document.createElement('link');
+        css1.rel = 'stylesheet';
+        css1.href = 'https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css';
+        document.head.appendChild(css1);
+      }
+    }
+    
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <>
       <MenuFixer />
