@@ -1,37 +1,466 @@
-/* Force tabbar menu links to show up and be visible on all pages */
-@media(min-width: 992px) {
-  .calypso-menu .calypso-menu__item,
-  .calypso-menu .calypso-menu__item--dropdown {
-    display: inline-block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
+/* =============================================================
+   ECWID CLONE — GLOBAL POLISH
+   Fixes: spacing, typography, mobile layout, scroll animations
+   ============================================================= */
+
+/* ── Design tokens ── */
+:root {
+  --nav-h: 72px;
+  --gap: 1.5rem;
+  --radius: 16px;
+  --shadow: 0 4px 32px rgba(0,0,0,.08);
+  --yellow: #fae053;
+  --black: #0a0c0f;
+  --mid: #515258;
+  --light: #f7f7f8;
+  --font: 'Open Sans', system-ui, -apple-system, sans-serif;
+}
+
+/* ── Reset & base ── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: var(--font);
+  color: var(--black);
+  background: #fff;
+  overflow-x: hidden;
+  margin: 0;
+}
+
+img { max-width: 100%; height: auto; display: block; }
+
+a { text-decoration: none; color: inherit; }
+
+/* ── NAV BAR ── */
+.calypso-menu {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 9999 !important;
+  background: rgba(255,255,255,0.92) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(0,0,0,0.07) !important;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.06) !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  left: 0 !important;
+  max-width: 100% !important;
+  width: 100% !important;
+}
+
+/* Fix the calypso-header wrapper so nav is at top */
+.calypso-header {
+  position: sticky;
+  top: 0;
+  z-index: 9999;
+}
+
+/* ── Show all menu items ── */
+.calypso-menu .calypso-menu__item,
+.calypso-menu .calypso-menu__item--dropdown,
+.calypso-menu .calypso-menu__item--login {
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.calypso-menu a.calypso-menu__link {
+  display: inline-block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  color: var(--black) !important;
+  font-weight: 600 !important;
+  font-size: 15px !important;
+  transition: color 0.2s ease !important;
+}
+
+.calypso-menu a.calypso-menu__link:hover {
+  color: #555 !important;
+}
+
+/* ── MOBILE HAMBURGER visible ── */
+.calypso-menu__item--mobile {
+  display: inline-flex !important;
+}
+
+/* ── Mobile menu overlay ── */
+.calypso-menu__mobile {
+  transition: opacity 0.3s ease, right 0.3s ease !important;
+}
+
+/* ── Main container: remove top padding that creates gap ── */
+.main-container {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* ── PAGE wrapper: push content below sticky nav ── */
+.page.calypso-page.hpc-page {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* ── Remove the weird huge blank space on homepage ── */
+.calypso-viewport#tile-1,
+.calypso-viewport:first-child {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* Fix the enormous gap between nav and homepage hero */
+.calypso-page.hpc-page {
+  padding-top: 0 !important;
+}
+
+/* ── HERO SECTIONS on subpages: no overlap with sticky nav ── */
+.promote-page .promote-hero,
+.facebook-page .hpc-hero,
+.manage-page .manage-hero {
+  padding-top: calc(var(--nav-h) + 2rem) !important;
+}
+
+/* ── Generic block spacing ── */
+.calypso-block {
+  padding-top: 4rem;
+  padding-bottom: 4rem;
+}
+
+/* ── Typography ── */
+h1, h2, h3, h4, h5 {
+  font-family: 'Montserrat', var(--font);
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+h1 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h2 { font-size: clamp(1.5rem, 4vw, 2.75rem); }
+h5 { font-size: 1.1rem; }
+
+p {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  color: var(--mid);
+}
+
+/* ── CTAs ── */
+.btn {
+  border-radius: 8px !important;
+  font-weight: 700 !important;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease !important;
+}
+.btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15) !important;
+}
+.btn--large {
+  padding: 14px 36px !important;
+  font-size: 1rem !important;
+}
+
+/* ── HOME page: fix empty gap below nav ── */
+.calypso-block--EW19-tile-1 {
+  padding-top: 3rem !important;
+}
+
+/* The promo hero section gets the first padding */
+.calypso-block--EW19-tile-1 .calypso-promo.calypso-promo--first-lg-b48 {
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+}
+
+/* ── PROMOTE page ── */
+.promote-paralax {
+  min-height: 75vh;
+}
+.promote-paralax__text-block {
+  padding-top: 5rem !important;
+}
+
+/* ── FACEBOOK page: fix the hero overlap ── */
+.facebook-section-hero {
+  padding-top: 2rem !important;
+}
+
+/* ── Slider / feature sections ── */
+.hpc-slider__slide {
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* ── Cards / hpc-cart ── */
+.hpc-cart {
+  display: block;
+  border-radius: var(--radius);
+  padding: 2rem;
+  border: 1px solid rgba(0,0,0,.07);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  background: #fff;
+}
+.hpc-cart:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow);
+}
+.hpc-cart__icon { margin-bottom: 1.25rem; }
+.hpc-cart__icon svg { width: 56px; height: 56px; }
+.hpc-cart h5 { margin: 0 0 0.5rem; font-size: 1.1rem; }
+.hpc-cart p { font-size: 0.95rem; }
+
+/* ── Awards strip ── */
+.calypso-awards {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 3rem 2rem;
+  background: var(--light);
+  border-radius: var(--radius);
+  margin: 3rem 0;
+}
+.calypso-awards__image {
+  width: 90px;
+  height: auto;
+  object-fit: contain;
+  filter: grayscale(30%);
+  transition: filter 0.2s ease;
+}
+.calypso-awards__image:hover { filter: none; }
+
+/* ── Footer ── */
+.footer {
+  background: #1a1a1a !important;
+  color: #ccc !important;
+}
+.footer a { color: #aaa !important; transition: color 0.2s ease; }
+.footer a:hover { color: #fff !important; }
+.footer-menu { padding: 4rem 0 3rem; }
+.footer-menu__logo svg { height: 28px; width: auto; }
+
+/* ── SCROLL ANIMATIONS ── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes fadeInLeft {
+  from { opacity: 0; transform: translateX(-30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes fadeInRight {
+  from { opacity: 0; transform: translateX(30px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+.hpc-animate {
+  opacity: 0;
+}
+.hpc-animate.hpc-animate--animated {
+  animation: fadeInUp 0.7s ease both;
+}
+.hpc-animate.hpc-animate--from-left.hpc-animate--animated {
+  animation: fadeInLeft 0.7s ease both;
+}
+.hpc-animate.hpc-animate--from-right.hpc-animate--animated {
+  animation: fadeInRight 0.7s ease both;
+}
+.hpc-animate--delay-1 { animation-delay: 0.1s !important; }
+.hpc-animate--delay-2 { animation-delay: 0.2s !important; }
+.hpc-animate--delay-3 { animation-delay: 0.35s !important; }
+.hpc-animate--delay-4 { animation-delay: 0.5s !important; }
+.hpc-animate--delay-5 { animation-delay: 0.6s !important; }
+.hpc-animate--delay-6 { animation-delay: 0.7s !important; }
+
+.animate {
+  opacity: 0;
+  transition: opacity 0.7s ease, transform 0.7s ease;
+  transform: translateY(24px);
+}
+.animate.animate--animated {
+  opacity: 1;
+  transform: none;
+}
+/* On mobile, animate immediately */
+.animate--mobile-only {
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* ── PROMOTE page specific fixes ── */
+.promote-paralax__layer {
+  will-change: transform;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  /* Nav: hide desktop links, show burger */
+  .calypso-menu__group--1 .calypso-menu__item:not(.calypso-menu__item--logo) {
+    display: none !important;
   }
-  
-  .calypso-menu a.calypso-menu__link {
-    display: inline-block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    color: #303030; /* Ensure text is dark and visible */
+  .calypso-menu__group--2 .calypso-menu__item--login {
+    display: none !important;
+  }
+  .calypso-menu__item--mobile {
+    display: inline-flex !important;
+  }
+  .calypso-menu__item--cta {
+    display: inline-flex !important;
   }
 
-  /* Make sure the main menu container is always visible and on top */
-  .calypso-menu {
-    position: relative !important;
-    z-index: 999999 !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    display: block !important;
+  /* Hero sections */
+  .calypso-promo {
+    flex-direction: column;
+    gap: 2rem;
+  }
+  .calypso-promo__first,
+  .calypso-promo__second {
+    width: 100% !important;
+    max-width: 100% !important;
+    flex: 0 0 100% !important;
+    text-align: center;
+  }
+
+  h1 { font-size: 2.25rem !important; }
+  h2 { font-size: 1.75rem !important; }
+
+  .calypso-block {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+
+  .container {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+
+  /* Make promote paralax blocks full-width on mobile */
+  .promote-paralax { min-height: auto; }
+
+  /* Manage page feature grid */
+  .row { flex-direction: column !important; }
+  .col-12.col-lg-4 { max-width: 100% !important; flex: 0 0 100% !important; }
+
+  /* Awards smaller on mobile */
+  .calypso-awards__image { width: 64px; }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  h1 { font-size: 2.8rem !important; }
+  h2 { font-size: 2.2rem !important; }
+
+  .col-12.col-lg-4 {
+    flex: 0 0 33.333% !important;
+    max-width: 33.333% !important;
   }
 }
 
-/* Ensure dropdown menus work when the hidden class is removed */
+/* ── Misc polish ── */
+.container { max-width: 1200px; margin-left: auto; margin-right: auto; }
+
+/* Remove double-header glitch */
+.calypso-page.calypso-header + .calypso-page.calypso-header { display: none; }
+
+/* Smooth chevron arrows */
+.chevron-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  color: var(--black) !important;
+  transition: gap 0.2s ease;
+}
+.chevron-right:hover { gap: 0.7rem; }
+
+/* No-scrollbar on mobile sliders */
+.hpc-mobile-slider__slider {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.hpc-mobile-slider__slider::-webkit-scrollbar { display: none; }
+
+/* Ensure dropdown visible on hover */
+.calypso-menu__item--dropdown:hover .calypso-menu__dropdown {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
 .calypso-menu__dropdown:not(.calypso-menu__dropdown--hidden) {
   opacity: 1 !important;
   visibility: visible !important;
   transform: none !important;
 }
 
-/* Fix mobile menu button visibility if needed */
-.calypso-menu__button {
-  z-index: 999999 !important;
+/* ── REGISTER / sign-up page ── */
+.wj_registration, .cp-reg {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f7f7f8 0%, #e8e9ec 100%);
+  padding: 2rem;
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   HERO SECTION — CRITICAL FIRST-PAINT FIXES
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Hero elements must be immediately visible on first paint.
+   The JS animation observer will add classes — but we want to
+   ensure they start visible so there is NO layout gap. */
+.hpc-animate--delay-1,
+.hpc-animate--delay-2,
+.hpc-animate--delay-3 {
+  opacity: 1 !important;
+}
+
+/* Once the JS fires, allow the animation */
+.hpc-animate--animated {
+  opacity: 1 !important;
+}
+
+/* Collapse the dead space between menu and homepage hero */
+.calypso-block--EW19-tile-1:first-child,
+.calypso-viewport#tile-1 {
+  margin-top: 0 !important;
+  padding-top: 2.5rem !important;
+}
+
+/* ── Sub-page hero top padding (prevent overlap with sticky nav) ── */
+
+/* Promote page hero */
+.promote-paralax__text-block,
+.promote-block:first-child,
+[class*="promote"] .calypso-block:first-child section {
+  padding-top: 3rem !important;
+}
+
+/* Facebook page hero — the first block which has text "仅几分钟" */
+.page.calypso-page .calypso-viewport:first-child,
+.page.calypso-page section:first-child {
+  padding-top: 2rem !important;
+}
+
+/* Manage page hero */
+.manage-block:first-child section,
+.manage-viewport:first-child {
+  padding-top: 2rem !important;
+}
+
+/* Generic: any page's first calypso section gets breathing room */
+.page.calypso-page > .calypso-viewport:first-child > section > .container,
+.page.calypso-page > section:first-child > .container {
+  padding-top: 3rem !important;
+}
+
+/* ── Home page: reduce extra vertical centering that creates white gap ── */
+.calypso-promo--first-lg-b48 {
+  min-height: auto !important;
+  padding-top: 1rem !important;
+  padding-bottom: 2rem !important;
+}
+
+/* ── Remove any margin-top on the .page element ── */
+.page.calypso-page.hpc-page.no_translate {
+  margin-top: 0 !important;
 }

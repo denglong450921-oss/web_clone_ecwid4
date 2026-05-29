@@ -7,54 +7,170 @@ export default function MenuFixer() {
   const pathname = usePathname();
 
   useEffect(() => {
-    // Add hover event listeners to all dropdown menus
-    const dropdowns = document.querySelectorAll('.calypso-menu__item--dropdown');
-    
-    dropdowns.forEach(dropdown => {
-      // For desktop hover
-      dropdown.addEventListener('mouseenter', () => {
-        const menu = dropdown.querySelector('.calypso-menu__dropdown');
-        if (menu) {
-          menu.classList.remove('calypso-menu__dropdown--hidden');
-          dropdown.classList.add('calypso-menu__item--active');
-        }
-      });
-      
-      dropdown.addEventListener('mouseleave', () => {
-        const menu = dropdown.querySelector('.calypso-menu__dropdown');
-        if (menu) {
-          menu.classList.add('calypso-menu__dropdown--hidden');
-          dropdown.classList.remove('calypso-menu__item--active');
-        }
+    // ── 1. SCROLL ANIMATIONS ─────────────────────────────────────────────
+    const animObserver = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const el = entry.target as HTMLElement;
+            el.classList.add("hpc-animate--animated", "animate--animated");
+            el.style.opacity = "1";
+            el.style.transform = "none";
+            animObserver.unobserve(el);
+          }
+        });
+      },
+      { threshold: 0.12 }
+    );
+
+    document
+      .querySelectorAll(
+        ".hpc-animate, .animate:not(.animate--mobile-only), .hpc-slider__slide, .hpc-slider__layer"
+      )
+      .forEach((el) => {
+        (el as HTMLElement).style.opacity = "0";
+        animObserver.observe(el);
       });
 
-      // For mobile click
-      dropdown.addEventListener('click', (e) => {
-        // Only toggle if we clicked the main item, not a link inside the dropdown
-        if ((e.target as HTMLElement).closest('.calypso-menu__dropdown')) return;
-        
-        e.preventDefault();
-        const menu = dropdown.querySelector('.calypso-menu__dropdown');
-        if (menu) {
-          menu.classList.toggle('calypso-menu__dropdown--hidden');
-          dropdown.classList.toggle('calypso-menu__item--active');
+    // ── 2. DESKTOP DROPDOWN HOVER ────────────────────────────────────────
+    const dropdowns = document.querySelectorAll<HTMLElement>(
+      ".calypso-menu__item--dropdown"
+    );
+
+    const showDropdown = (dropdown: HTMLElement) => {
+      const menu = dropdown.querySelector<HTMLElement>(
+        ".calypso-menu__dropdown"
+      );
+      if (menu) {
+        menu.classList.remove("calypso-menu__dropdown--hidden");
+        dropdown.classList.add("calypso-menu__item--active");
+      }
+      // Also close all other dropdowns
+      dropdowns.forEach((d) => {
+        if (d !== dropdown) {
+          const m = d.querySelector<HTMLElement>(".calypso-menu__dropdown");
+          if (m) m.classList.add("calypso-menu__dropdown--hidden");
+          d.classList.remove("calypso-menu__item--active");
         }
+      });
+    };
+
+    const hideDropdown = (dropdown: HTMLElement) => {
+      const menu = dropdown.querySelector<HTMLElement>(
+        ".calypso-menu__dropdown"
+      );
+      if (menu) {
+        menu.classList.add("calypso-menu__dropdown--hidden");
+        dropdown.classList.remove("calypso-menu__item--active");
+      }
+    };
+
+    dropdowns.forEach((dropdown) => {
+      dropdown.addEventListener("mouseenter", () => showDropdown(dropdown));
+      dropdown.addEventListener("mouseleave", () => hideDropdown(dropdown));
+
+      // Mobile click to toggle
+      dropdown.addEventListener("click", (e) => {
+        if ((e.target as HTMLElement).closest(".calypso-menu__dropdown"))
+          return;
+        const menu = dropdown.querySelector<HTMLElement>(
+          ".calypso-menu__dropdown"
+        );
+        if (menu) {
+          const isHidden = menu.classList.contains(
+            "calypso-menu__dropdown--hidden"
+          );
+          if (isHidden) showDropdown(dropdown);
+          else hideDropdown(dropdown);
+        }
+        e.stopPropagation();
       });
     });
 
-    // Handle mobile hamburger menu toggle
-    const hamburger = document.querySelector('.calypso-menu__button');
-    const menuGroup = document.querySelector('.calypso-menu__group--2');
-    
-    if (hamburger) {
-      hamburger.addEventListener('click', () => {
-        const header = document.querySelector('.calypso-header');
-        const container = document.querySelector('.main-container');
-        if (header) header.classList.toggle('menu-on');
-        if (container) container.classList.toggle('pushed');
+    // Close dropdowns when clicking outside
+    const closeAll = () => {
+      dropdowns.forEach((d) => hideDropdown(d));
+    };
+    document.addEventListener("click", closeAll);
+
+    // ── 3. MOBILE BURGER MENU ────────────────────────────────────────────
+    const burger = document.querySelector<HTMLElement>(".calypso-menu__burger");
+    const mobileMenu = document.querySelector<HTMLElement>(
+      ".calypso-menu__mobile"
+    );
+    const nav = document.querySelector<HTMLElement>(".calypso-menu");
+
+    if (burger && mobileMenu) {
+      burger.style.cursor = "pointer";
+      burger.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = nav?.classList.contains("calypso-menu--mobile-open");
+        if (isOpen) {
+          nav?.classList.remove("calypso-menu--mobile-open");
+          mobileMenu.style.opacity = "0";
+          mobileMenu.style.visibility = "hidden";
+          mobileMenu.style.right = "-100%";
+        } else {
+          nav?.classList.add("calypso-menu--mobile-open");
+          mobileMenu.style.opacity = "1";
+          mobileMenu.style.visibility = "visible";
+          mobileMenu.style.right = "0";
+        }
       });
     }
 
+    // ── 4. STICKY NAV SHADOW ON SCROLL ───────────────────────────────────
+    const onScroll = () => {
+      const navEl = document.querySelector<HTMLElement>(".calypso-menu");
+      if (!navEl) return;
+      if (window.scrollY > 20) {
+        navEl.style.boxShadow = "0 4px 24px rgba(0,0,0,0.12)";
+      } else {
+        navEl.style.boxShadow = "0 2px 16px rgba(0,0,0,0.06)";
+      }
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    // ── 5. MOBILE MENU ACCORDION ─────────────────────────────────────────
+    document
+      .querySelectorAll<HTMLElement>(".calypso-menu__mobile-items > li")
+      .forEach((li) => {
+        const subMenu = li.querySelector<HTMLElement>(
+          ".calypso-menu__mobile-dropdown-menu"
+        );
+        const span = li.querySelector<HTMLElement>("span");
+        if (subMenu && span) {
+          subMenu.style.maxHeight = "0";
+          subMenu.style.overflow = "hidden";
+          subMenu.style.transition = "max-height 0.3s ease";
+          span.style.cursor = "pointer";
+          span.addEventListener("click", () => {
+            const open = li.classList.contains("calypso-menu__mobile-menu--active");
+            // Close all
+            document
+              .querySelectorAll<HTMLElement>(
+                ".calypso-menu__mobile-items > li"
+              )
+              .forEach((other) => {
+                other.classList.remove("calypso-menu__mobile-menu--active");
+                const sm = other.querySelector<HTMLElement>(
+                  ".calypso-menu__mobile-dropdown-menu"
+                );
+                if (sm) sm.style.maxHeight = "0";
+              });
+            if (!open) {
+              li.classList.add("calypso-menu__mobile-menu--active");
+              subMenu.style.maxHeight = subMenu.scrollHeight + "px";
+            }
+          });
+        }
+      });
+
+    return () => {
+      animObserver.disconnect();
+      document.removeEventListener("click", closeAll);
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [pathname]);
 
   return null;
