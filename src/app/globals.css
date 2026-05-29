@@ -473,3 +473,21 @@ p {
 section.calypso-block--background-menu {
   margin-top: 9rem !important;
 }
+
+/* ── SELL page specific fixes ── */
+.hpc-slider__screen,
+.hpc-slider__slide,
+.hpc-slider__layer,
+.calypso-showcase__image,
+.calypso-showcase__image-in,
+.calypso-showcase__image-fb,
+.calypso-showcase__image-web {
+  opacity: 1 !important;
+  visibility: visible !important;
+  display: block !important;
+  transform: none !important;
+}
+
+.sticky-promo__image {
+  opacity: 1 !important;
+}

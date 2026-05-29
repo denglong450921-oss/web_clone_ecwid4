@@ -39,18 +39,18 @@ export default function ManagePage() {
         if (!relativeEl) return;
 
         const relativeTop = relativeEl.getBoundingClientRect().top + window.scrollY;
-        const relativeBottom = relativeTop + relativeEl.offsetHeight;
+        const relativeBottom = relativeTop + (relativeEl as HTMLElement).offsetHeight;
 
         layers.forEach(layer => {
           if (windowWidth >= config.min_width) {
             if (windowScrollTop <= relativeBottom && relativeTop < windowBottom) {
               const newCoord = (windowScrollTop - relativeTop) * config.coeff;
-              layer.style.transform = `translate3d(0, ${newCoord}px, 0px)`;
-              layer.style.transition = 'none';
+              (layer as HTMLElement).style.transform = `translate3d(0, ${newCoord}px, 0px)`;
+              (layer as HTMLElement).style.transition = 'none';
             }
           } else {
-            layer.style.transform = '';
-            layer.style.transition = '';
+            (layer as HTMLElement).style.transform = '';
+            (layer as HTMLElement).style.transition = '';
           }
         });
       });
