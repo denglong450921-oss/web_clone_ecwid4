@@ -35,18 +35,19 @@ export default function SellPage() {
           // Phones split left and right
           const moveX = Math.min(windowScrollTop * 1.5, 800);
           
-          // Make devices sticky by moving them DOWN as we scroll DOWN.
-          // This allows the text originally below them to catch up and perfectly center between them.
-          const moveYDevice = Math.min(windowScrollTop * 0.9, 450);
+          // Description text moves UP extremely fast to close the gap with the header text
+          const moveYText = -Math.min(windowScrollTop * 2.1, 700);
+          
+          // Devices scroll normally (0 translation) so they don't clip into the navbar
+          const moveYDevice = 0;
           
           phone.style.transform = `translate3d(-${moveX}px, ${moveYDevice}px, 0)`;
           tablet.style.transform = `translate3d(${moveX}px, ${moveYDevice}px, 0)`;
-          
-          // The description text stays in place and just scrolls normally up from below
-          heroDescr.style.transform = 'none';
+          heroDescr.style.transform = `translate3d(0, ${moveYText}px, 0)`;
           
           phone.style.transition = 'transform 0.1s ease-out';
           tablet.style.transition = 'transform 0.1s ease-out';
+          heroDescr.style.transition = 'transform 0.1s ease-out';
         }
       } else {
         const phone = document.querySelector('.sell-hero__phone');
