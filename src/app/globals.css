@@ -394,6 +394,20 @@ p {
   padding: 16px 0 !important;
 }
 
+/* Up-arrow pointing to the nav item */
+.calypso-menu__dropdown:not(.calypso-menu__dropdown--hidden)::after {
+  content: "" !important;
+  position: absolute !important;
+  top: -8px !important;
+  left: 31px !important;
+  transform: translateX(-50%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 8px solid transparent !important;
+  border-right: 8px solid transparent !important;
+  border-bottom: 8px solid #ffffff !important;
+}
+
 .calypso-menu__dropdown-overflow {
   overflow: visible !important;
   height: auto !important;
