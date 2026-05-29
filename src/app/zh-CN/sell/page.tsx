@@ -42,8 +42,10 @@ export default function SellPage() {
           // Header stays pinned completely during animation
           heroHeader.style.transform = `translate3d(0, ${stickyY}px, 0)`;
           
-          // Phones split left and right
-          const moveX = Math.min(animScroll * 1.5, 600);
+                              // Phones split left and right - use a large fixed value (800) to ensure they clear the text on ALL screen sizes >= 991px
+          const maxMoveX = 850;
+          const speedMultiplier = maxMoveX / 400;
+          const moveX = animScroll * speedMultiplier;
           
           // Description text moves up relative to sticky position to close the gap
           const descrMoveUp = Math.min(animScroll * 1.3, 500);
