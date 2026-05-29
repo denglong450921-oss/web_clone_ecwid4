@@ -389,6 +389,9 @@ p {
   visibility: visible !important;
   transform: none !important;
   display: block !important;
+  background-color: #ffffff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12) !important;
 }
 
 .calypso-menu__dropdown-overflow {
