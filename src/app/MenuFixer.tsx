@@ -85,9 +85,6 @@ export default function MenuFixer() {
     };
 
     dropdowns.forEach((dropdown) => {
-      dropdown.addEventListener("mouseenter", () => showDropdown(dropdown));
-      dropdown.addEventListener("mouseleave", () => hideDropdown(dropdown));
-
       // Prevent default navigation for the top-level link of the dropdown
       const link = dropdown.querySelector<HTMLElement>(".calypso-menu__link");
       if (link) {
@@ -126,7 +123,11 @@ export default function MenuFixer() {
     });
 
     // Close dropdowns when clicking outside
-    const closeAll = () => {
+    const closeAll = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      if (target.closest(".calypso-menu__item--dropdown")) {
+        return;
+      }
       dropdowns.forEach((d) => hideDropdown(d));
     };
     document.addEventListener("click", closeAll);

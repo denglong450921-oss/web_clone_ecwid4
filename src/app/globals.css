@@ -383,13 +383,7 @@ p {
 }
 .hpc-mobile-slider__slider::-webkit-scrollbar { display: none; }
 
-/* Ensure dropdown visible on hover */
-.calypso-menu__item--dropdown:hover .calypso-menu__dropdown {
-  opacity: 1 !important;
-  visibility: visible !important;
-  transform: none !important;
-  display: block !important;
-}
+/* Ensure dropdown visible when not hidden */
 .calypso-menu__dropdown:not(.calypso-menu__dropdown--hidden) {
   opacity: 1 !important;
   visibility: visible !important;
