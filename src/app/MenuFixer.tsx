@@ -38,30 +38,49 @@ export default function MenuFixer() {
     );
 
     const showDropdown = (dropdown: HTMLElement) => {
-      const menu = dropdown.querySelector<HTMLElement>(
+      const menu = dropdown.closest(".calypso-menu")?.querySelector<HTMLElement>(
         ".calypso-menu__dropdown"
       );
       if (menu) {
         menu.classList.remove("calypso-menu__dropdown--hidden");
         dropdown.classList.add("calypso-menu__item--active");
+        
+        // Find the inner dropdown item and make it active
+        const dataItem = dropdown.getAttribute("data-item");
+        if (dataItem !== null) {
+          const innerItem = menu.querySelector<HTMLElement>(`.calypso-menu__dropdown-item--item-${dataItem}`);
+          if (innerItem) {
+            innerItem.classList.add("calypso-menu__dropdown-item--active");
+          }
+        }
       }
       // Also close all other dropdowns
       dropdowns.forEach((d) => {
         if (d !== dropdown) {
-          const m = d.querySelector<HTMLElement>(".calypso-menu__dropdown");
-          if (m) m.classList.add("calypso-menu__dropdown--hidden");
+          const m = d.closest(".calypso-menu")?.querySelector<HTMLElement>(".calypso-menu__dropdown");
+          if (m) {
+            m.classList.add("calypso-menu__dropdown--hidden");
+            // deactivate inner items
+            m.querySelectorAll(".calypso-menu__dropdown-item").forEach(item => {
+              item.classList.remove("calypso-menu__dropdown-item--active");
+            });
+          }
           d.classList.remove("calypso-menu__item--active");
         }
       });
     };
 
     const hideDropdown = (dropdown: HTMLElement) => {
-      const menu = dropdown.querySelector<HTMLElement>(
+      const menu = dropdown.closest(".calypso-menu")?.querySelector<HTMLElement>(
         ".calypso-menu__dropdown"
       );
       if (menu) {
         menu.classList.add("calypso-menu__dropdown--hidden");
         dropdown.classList.remove("calypso-menu__item--active");
+        // deactivate inner items
+        menu.querySelectorAll(".calypso-menu__dropdown-item").forEach(item => {
+          item.classList.remove("calypso-menu__dropdown-item--active");
+        });
       }
     };
 
@@ -69,11 +88,30 @@ export default function MenuFixer() {
       dropdown.addEventListener("mouseenter", () => showDropdown(dropdown));
       dropdown.addEventListener("mouseleave", () => hideDropdown(dropdown));
 
-      // Mobile click to toggle
+      // Prevent default navigation for the top-level link of the dropdown
+      const link = dropdown.querySelector<HTMLElement>(".calypso-menu__link");
+      if (link) {
+        link.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const menu = dropdown.closest(".calypso-menu")?.querySelector<HTMLElement>(
+            ".calypso-menu__dropdown"
+          );
+          if (menu) {
+            const isHidden = menu.classList.contains(
+              "calypso-menu__dropdown--hidden"
+            );
+            if (isHidden) showDropdown(dropdown);
+            else hideDropdown(dropdown);
+          }
+        });
+      }
+
+      // Mobile/general click to toggle
       dropdown.addEventListener("click", (e) => {
         if ((e.target as HTMLElement).closest(".calypso-menu__dropdown"))
           return;
-        const menu = dropdown.querySelector<HTMLElement>(
+        const menu = dropdown.closest(".calypso-menu")?.querySelector<HTMLElement>(
           ".calypso-menu__dropdown"
         );
         if (menu) {

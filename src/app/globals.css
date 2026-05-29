@@ -388,11 +388,13 @@ p {
   opacity: 1 !important;
   visibility: visible !important;
   transform: none !important;
+  display: block !important;
 }
 .calypso-menu__dropdown:not(.calypso-menu__dropdown--hidden) {
   opacity: 1 !important;
   visibility: visible !important;
   transform: none !important;
+  display: block !important;
 }
 
 /* ── REGISTER / sign-up page ── */

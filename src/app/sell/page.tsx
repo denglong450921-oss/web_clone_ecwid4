@@ -2,7 +2,7 @@
 import { useEffect } from 'react';
 import React from "react";
 import Link from "next/link";
-import MenuFixer from "../../MenuFixer";
+import MenuFixer from "../MenuFixer";
 
 export default function SellPage() {
 
@@ -15,7 +15,7 @@ export default function SellPage() {
           if(entry.target.classList.contains('hpc-animate')) entry.target.classList.add('hpc-animate--animated');
         } else {
           // If you want them to animate again when scrolling up/down
-          // entry.target.classList.remove('hpc-slider__slide--active');
+          entry.target.classList.remove('hpc-slider__slide--active');
         }
       });
     }, { threshold: 0.3 });
@@ -27,10 +27,10 @@ export default function SellPage() {
       const windowScrollTop = window.scrollY || document.documentElement.scrollTop;
       const windowWidth = window.innerWidth;
       if (windowWidth >= 991) {
-        const phone = document.querySelector('.sell-hero__phone');
-        const tablet = document.querySelector('.sell-hero__tablet');
-        const heroDescr = document.querySelector('.sell-hero__descr');
-        const heroHeader = document.querySelector('.sell-hero__container > .row:first-child');
+        const phone = document.querySelector('.sell-hero__phone') as HTMLElement;
+        const tablet = document.querySelector('.sell-hero__tablet') as HTMLElement;
+        const heroDescr = document.querySelector('.sell-hero__descr') as HTMLElement;
+        const heroHeader = document.querySelector('.sell-hero__container > .row:first-child') as HTMLElement;
         
         if (phone && tablet && heroDescr && heroHeader) {
           // Limit the animation to a max scroll of 400px so it stops and then scrolls off naturally
@@ -39,22 +39,34 @@ export default function SellPage() {
           // Sticky effect: pin them to the screen
           const stickyY = animScroll;
           
-          // Header stays pinned completely during animation
+          // Header stays pinned completely without any drift or extra animation
           heroHeader.style.transform = `translate3d(0, ${stickyY}px, 0)`;
           
-                              // Phones split left and right - use a large fixed value (800) to ensure they clear the text on ALL screen sizes >= 991px
-          const maxMoveX = 850;
-          const speedMultiplier = maxMoveX / 400;
-          const moveX = animScroll * speedMultiplier;
+          // Phone moves shorter distance to stay 100% visible on screen and not cover left text
+          const maxPhoneMoveX = Math.min(windowWidth * 0.16, 250);
+          const phoneSpeedMultiplier = maxPhoneMoveX / 400;
+          const phoneMoveX = animScroll * phoneSpeedMultiplier;
+
+          // Tablet moves much further (up to 850px) to clear the wider text block completely on the right
+          const maxTabletMoveX = Math.min(windowWidth * 0.45, 850);
+          const tabletSpeedMultiplier = maxTabletMoveX / 400;
+          const tabletMoveX = animScroll * tabletSpeedMultiplier;
           
-          // Description text moves up relative to sticky position to close the gap
-          const descrMoveUp = Math.min(animScroll * 1.3, 500);
+          // Measure original vertical gap in the DOM flow dynamically
+          const headerOriginalBottom = heroHeader.offsetTop + heroHeader.offsetHeight;
+          const descrOriginalTop = heroDescr.offsetTop;
+          const originalGap = descrOriginalTop - headerOriginalBottom;
+
+          // Cap the upward movement dynamically to ensure at least a 45px safe gap is maintained
+          // and they NEVER cover or overlap each other, even with multi-line wrapped text!
+          const maxDescrMoveUp = Math.max(originalGap - 45, 300);
+          const descrMoveUp = Math.min(animScroll * 1.65, maxDescrMoveUp);
           heroDescr.style.transform = `translate3d(0, ${stickyY - descrMoveUp}px, 0)`;
           
           // Devices move up slightly relative to sticky position to frame the description
           const deviceMoveUp = Math.min(animScroll * 0.4, 160);
-          phone.style.transform = `translate3d(-${moveX}px, ${stickyY - deviceMoveUp}px, 0)`;
-          tablet.style.transform = `translate3d(${moveX}px, ${stickyY - deviceMoveUp}px, 0)`;
+          phone.style.transform = `translate3d(-${phoneMoveX}px, ${stickyY - deviceMoveUp}px, 0)`;
+          tablet.style.transform = `translate3d(${tabletMoveX}px, ${stickyY - deviceMoveUp}px, 0)`;
           
           heroHeader.style.transition = 'transform 0.1s ease-out';
           phone.style.transition = 'transform 0.1s ease-out';
@@ -62,10 +74,10 @@ export default function SellPage() {
           heroDescr.style.transition = 'transform 0.1s ease-out';
         }
       } else {
-        const phone = document.querySelector('.sell-hero__phone');
-        const tablet = document.querySelector('.sell-hero__tablet');
-        const heroDescr = document.querySelector('.sell-hero__descr');
-        const heroHeader = document.querySelector('.sell-hero__container > .row:first-child');
+        const phone = document.querySelector('.sell-hero__phone') as HTMLElement;
+        const tablet = document.querySelector('.sell-hero__tablet') as HTMLElement;
+        const heroDescr = document.querySelector('.sell-hero__descr') as HTMLElement;
+        const heroHeader = document.querySelector('.sell-hero__container > .row:first-child') as HTMLElement;
         if(phone) { phone.style.transform = 'none'; phone.style.transition = 'none'; }
         if(tablet) { tablet.style.transform = 'none'; tablet.style.transition = 'none'; }
         if(heroDescr) { heroDescr.style.transform = 'none'; heroDescr.style.transition = 'none'; }
@@ -128,14 +140,14 @@ export default function SellPage() {
         id="menu-EW19"
         data-swiftype-index="false"
       >
-        <div className="calypso-menu calypso-menu--stick calypso-menu--display-always ">
-          <div className="calypso-menu__background"></div>
-          <div className="calypso-menu__inner container">
-            <div className="calypso-menu__group calypso-menu__group--1">
-              <div className="calypso-menu__item calypso-menu__item--logo">
-                <div className="calypso-menu__logo">
-                  <a href="https://www.ecwid.com/zh-CN">
-                    <svg
+        <div id="sellpage_menu_E1" className="calypso-menu calypso-menu--stick calypso-menu--display-always ">
+          <div id="sellpage_div_1" className="calypso-menu__background"></div>
+          <div id="sellpage_div_2" className="calypso-menu__inner container">
+            <div id="sellpage_div_3" className="calypso-menu__group calypso-menu__group--1">
+              <div id="sellpage_div_4" className="calypso-menu__item calypso-menu__item--logo">
+                <div id="sellpage_div_5" className="calypso-menu__logo">
+                  <a id="sellpage_a_1" href="https://www.ecwid.com/zh-CN">
+                    <svg id="sell-1"
                       enableBackground="new 0 0 1600 477"
                       viewBox="0 0 1600 477"
                       xmlns="http://www.w3.org/2000/svg"
@@ -167,132 +179,118 @@ export default function SellPage() {
                   </a>
                 </div>
               </div>
-              <div
-                data-item="0"
-                className="calypso-menu__item calypso-menu__item--bold hpc-nav__item--bold calypso-menu__item--dropdown"
-              >
-                <a href="/zh-CN/sell" className="calypso-menu__link">
+              <div id="sellpage_div_6" data-item="0"
+                className="calypso-menu__item calypso-menu__item--bold hpc-nav__item--bold calypso-menu__item--dropdown">
+                <a id="sellpage_a_2" href="/sell" className="calypso-menu__link">
                   销售
                 </a>
               </div>
-              <div className="calypso-menu__item">
-                <a href="/zh-CN/promote" className="calypso-menu__link">
+              <div id="sellpage_div_7" className="calypso-menu__item">
+                <a id="sellpage_a_3" href="/promote" className="calypso-menu__link">
                   推广
                 </a>
               </div>
-              <div className="calypso-menu__item">
-                <a href="/zh-CN/manage" className="calypso-menu__link">
+              <div id="sellpage_div_8" className="calypso-menu__item">
+                <a id="sellpage_a_4" href="/manage" className="calypso-menu__link">
                   管理
                 </a>
               </div>
             </div>
-            <div className="calypso-menu__group calypso-menu__group--2">
-              <div className="calypso-menu__item calypso-menu__item--login hpc-nav__item--login">
-                <a
-                  href="https://my.ecwid.com/cp/"
-                  className="calypso-menu__link"
-                >
+            <div id="sellpage_div_9" className="calypso-menu__group calypso-menu__group--2">
+              <div id="sellpage_div_10" className="calypso-menu__item calypso-menu__item--login hpc-nav__item--login">
+                <a id="sellpage_a_5" href="https://my.ecwid.com/cp/"
+                  className="calypso-menu__link">
                   登录
                 </a>
               </div>
-              <div className="calypso-menu__item calypso-menu__item--cta">
-                <div className="calypso-menu__button">
-                  <a
-                    href="https://my.ecwid.com/cp/#register"
+              <div id="sellpage_div_11" className="calypso-menu__item calypso-menu__item--cta">
+                <div id="sellpage_div_12" className="calypso-menu__button">
+                  <a id="sellpage_a_6" href="https://my.ecwid.com/cp/#register"
                     className="btn btn--small btn--nowrap cta-signup"
-                    target="_blank"
-                  >
+                    target="_blank">
                     开始
                   </a>
                 </div>
               </div>
             </div>
-            <div className="calypso-menu__dropdown calypso-menu__dropdown--hidden">
-              <div className="calypso-menu__dropdown-overflow">
-                <div className="calypso-menu__dropdown-container">
-                  <div className="calypso-menu__dropdown-item  calypso-menu__dropdown-item--item-0">
-                    <div className="calypso-menu__dropdown-headline">
-                      <a
-                        className="btn-link btn-link--active"
-                        href="/zh-CN/sell"
-                      >
-                        <span className="btn-link__content">销售</span>
+            <div id="sellpage_div_13" className="calypso-menu__dropdown calypso-menu__dropdown--hidden">
+              <div id="sellpage_div_14" className="calypso-menu__dropdown-overflow">
+                <div id="sellpage_div_15" className="calypso-menu__dropdown-container">
+                  <div id="sellpage_div_16" className="calypso-menu__dropdown-item  calypso-menu__dropdown-item--item-0">
+                    <div id="sellpage_div_17" className="calypso-menu__dropdown-headline">
+                      <a id="sellpage_a_7" className="btn-link btn-link--active"
+                        href="/sell">
+                        <span id="sellpage_span_1" className="btn-link__content">销售</span>
                       </a>
                     </div>
-                    <div className="calypso-menu__dropdown-menu">
-                      <div className="calypso-menu__dropdown-menu-item">
-                        <a href="/zh-CN/facebook">Facebook</a>
+                    <div id="sellpage_div_18" className="calypso-menu__dropdown-menu">
+                      <div id="sellpage_div_19" className="calypso-menu__dropdown-menu-item">
+                        <a id="sellpage_a_8" href="/facebook">Facebook</a>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className="calypso-menu__group calypso-menu__group--mobile">
-              <div className="calypso-menu__item calypso-menu__item--login">
-                <div className="calypso-menu__button">
-                  <a
-                    href="https://my.ecwid.com/cp/#register"
+            <div id="sellpage_div_20" className="calypso-menu__group calypso-menu__group--mobile">
+              <div id="sellpage_div_21" className="calypso-menu__item calypso-menu__item--login">
+                <div id="sellpage_div_22" className="calypso-menu__button">
+                  <a id="sellpage_a_9" href="https://my.ecwid.com/cp/#register"
                     className="btn btn--small btn--cta-mobile btn--nowrap cta-login"
-                    rel=""
-                  >
+                    rel="">
                     登录
                   </a>
                 </div>
               </div>
-              <div className="calypso-menu__item calypso-menu__item--cta">
-                <div className="calypso-menu__button">
-                  <a
-                    href="https://my.ecwid.com/cp/#signin"
+              <div id="sellpage_div_23" className="calypso-menu__item calypso-menu__item--cta">
+                <div id="sellpage_div_24" className="calypso-menu__button">
+                  <a id="sellpage_a_10" href="https://my.ecwid.com/cp/#signin"
                     className="btn btn--small btn--nowrap cta-signup"
-                    rel=""
-                  >
+                    rel="">
                     开始
                   </a>
                 </div>
               </div>
-              <div className="calypso-menu__item calypso-menu__item--mobile">
-                <div className="calypso-menu__burger">
-                  <div className="calypso-menu__burger-box">
-                    <div className="calypso-menu__burger-inner"></div>
+              <div id="sellpage_div_25" className="calypso-menu__item calypso-menu__item--mobile">
+                <div id="sellpage_div_26" className="calypso-menu__burger">
+                  <div id="sellpage_div_27" className="calypso-menu__burger-box">
+                    <div id="sellpage_div_28" className="calypso-menu__burger-inner"></div>
                   </div>
                 </div>
               </div>
-              <div className="calypso-menu__mobile">
-                <div className="calypso-menu__mobile-container">
-                  <ul className="calypso-menu__mobile-items">
-                    <li className=" hpc-nav__item--bold">
-                      <span>销售</span>
-                      <ul className="calypso-menu__mobile-dropdown-menu">
-                        <li>
-                          <a href="/zh-CN/sell">销售</a>
+              <div id="sellpage_div_29" className="calypso-menu__mobile">
+                <div id="sellpage_div_30" className="calypso-menu__mobile-container">
+                  <ul id="sellpage_ul_1" className="calypso-menu__mobile-items">
+                    <li id="sellpage_li_1" className=" hpc-nav__item--bold">
+                      <span id="sellpage_span_2">销售</span>
+                      <ul id="sellpage_ul_2" className="calypso-menu__mobile-dropdown-menu">
+                        <li id="sellpage_li_2">
+                          <a id="sellpage_a_11" href="/sell">销售</a>
                         </li>
-                        <li>
-                          <a href="/zh-CN/facebook">Facebook</a>
+                        <li id="sellpage_li_3">
+                          <a id="sellpage_a_12" href="/facebook">Facebook</a>
                         </li>
                       </ul>
                     </li>
-                    <li className="calypso-menu__mobile-items--without-dropdown">
-                      <a href="/zh-CN/promote">
-                        <span>推广</span>
+                    <li id="sellpage_li_4" className="calypso-menu__mobile-items--without-dropdown">
+                      <a id="sellpage_a_13" href="/promote">
+                        <span id="sellpage_span_3">推广</span>
                       </a>
                     </li>
-                    <li className="calypso-menu__mobile-items--without-dropdown">
-                      <a href="/zh-CN/manage">
-                        <span>管理</span>
+                    <li id="sellpage_li_5" className="calypso-menu__mobile-items--without-dropdown">
+                      <a id="sellpage_a_14" href="/manage">
+                        <span id="sellpage_span_4">管理</span>
                       </a>
                     </li>
                   </ul>
-                  <div className="btn-block text-center calypso-menu__mobile-buttons hpc-nav-disable-cta__display-none">
-                    <a
-                      href="https://my.ecwid.com/cp/#register"
+                  <div id="sellpage_div_31" className="btn-block text-center calypso-menu__mobile-buttons hpc-nav-disable-cta__display-none">
+                    <a id="sellpage_a_15" href="https://my.ecwid.com/cp/#register"
                       className="btn btn--w100 cta-signup btn--nowrap"
-                      target="_blank"
-                    >
+                      target="_blank">
                       开始
                     </a>
-                    <div className="calypso-menu__mobile-login">
-                      <a href="https://my.ecwid.com/cp/">登录</a>
+                    <div id="sellpage_div_32" className="calypso-menu__mobile-login">
+                      <a id="sellpage_a_16" href="https://my.ecwid.com/cp/">登录</a>
                     </div>
                   </div>
                 </div>
@@ -301,53 +299,47 @@ export default function SellPage() {
           </div>
         </div>
       </div>
-      <div
-        style={{ paddingTop: "90px" }}
-        className="page calypso-page hpc-page no_translate"
-      >
-        <section className="calypso-block calypso-block--EW19-small sell-hero">
-          <div className="container sell-hero__container">
-            <div className="row">
-              <div className="col-12 col-md-10 offset-md-1 col-xl-8 offset-xl-2 text-lg-center ">
-                <h4 className="text-gray text-normal">
+      <div id="sellpage_div_33" style={{ paddingTop: "90px" }}
+        className="page calypso-page hpc-page no_translate">
+        <section id="sellpage_hero_section_E2" className="calypso-block calypso-block--EW19-small sell-hero">
+          <div id="sellpage_div_34" className="container sell-hero__container">
+            <div id="sellpage_hero_title_row_E3" className="row">
+              <div id="sellpage_div_35" className="col-12 col-md-10 offset-md-1 col-xl-8 offset-xl-2 text-lg-center ">
+                <h4 id="sellpage_h4_1" className="text-gray text-normal">
                   只需几分钟即可创建在线店铺
                 </h4>
-                <h1>在线销售所需的一切事务</h1>
+                <h1 id="sellpage_h1_1">在线销售所需的一切事务</h1>
               </div>
             </div>
-            <div className="row sell-hero__block calypso-block__image">
-              <div className="col-12">
-                <div className="sell-hero__tablet">
+            <div id="sellpage_div_36" className="row sell-hero__block calypso-block__image">
+              <div id="sellpage_div_37" className="col-12">
+                <div id="sellpage_hero_tablet_E4" className="sell-hero__tablet">
                   {" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_content/Tab_Website.png"
+                  <img id="sellpage_img_1" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_content/Tab_Website.png"
                     className=""></img>
                 </div>
-                <div className="sell-hero__phone">
+                <div id="sellpage_hero_phone_E5" className="sell-hero__phone">
                   {" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_content/Phone_Website.png"
+                  <img id="sellpage_img_2" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_content/Phone_Website.png"
                     className=""></img>
                 </div>
               </div>
             </div>
-            <div className="row sell-hero__descr">
-              <div className="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
-                <p className="">
+            <div id="sellpage_hero_descr_E6" className="row sell-hero__descr">
+              <div id="sellpage_div_38" className="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
+                <p id="sellpage_p_1" className="">
                   Ecwid
                   让您可以随时随地通过互联网轻松地向世界各地的任何人销售。通过一个包含集中式存货、订单管理和定价功能的平台管理一切事务。没有比这更简单的了。
                 </p>
-                <div className="btn-block text-center ">
+                <div id="sellpage_div_39" className="btn-block text-center ">
                   {" "}
-                  <a
-                    href="https://my.ecwid.com/cp/#register"
+                  <a id="sellpage_a_17" href="https://my.ecwid.com/cp/#register"
                     className="btn btn--black btn--large btn--shadow cta-signup"
                     target="_blank"
-                    rel="nofollow noopener"
-                  >
+                    rel="nofollow noopener">
                     开始
                   </a>
-                  <div className="text-small text-gray"></div>
+                  <div id="sellpage_div_40" className="text-small text-gray"></div>
                 </div>
               </div>
             </div>
@@ -355,25 +347,25 @@ export default function SellPage() {
         </section>
         <section
           className="calypso-block calypso-block--EW19 calypso-block--overflow-hidden sticky-promo"
-          id="sticky-promo--1"
+          id="sellpage_promo1_section_E7"
           data-sticky-promo-id="1"
         >
-          <div className="container">
-            <div className="row calypso-promo">
-              <div className="col-12 col-md-10 offset-md-1 col-xl-5 offset-xl-0 calypso-promo__first align-center">
-                <div className="sticky-promo__block">
+          <div id="sellpage_div_41" className="container">
+            <div id="sellpage_div_42" className="row calypso-promo">
+              <div id="sellpage_div_43" className="col-12 col-md-10 offset-md-1 col-xl-5 offset-xl-0 calypso-promo__first align-center">
+                <div id="sellpage_div_44" className="sticky-promo__block">
                   <div
                     className="sticky-promo__text "
                     data-sticky-promo-id="1"
-                    id="sticky-promo__text--1"
+                    id="sellpage_promo1_text_E8"
                   >
-                    <h2 className="h1">在网站上销售</h2>
-                    <p>
+                    <h2 id="sellpage_h2_1" className="h1">在网站上销售</h2>
+                    <p id="sellpage_p_2">
                       借助简单的可定制设计工具，只需
                       5 分钟即可从头开始创建新的网站，或者通过可即时模仿您的当前设计的技术，将在线店铺快速添加到现有网站。无需编码或安装软件。
                     </p>
-                    <div className="calypso-logo calypso-logo--g2">
-                      <svg
+                    <div id="sellpage_div_45" className="calypso-logo calypso-logo--g2">
+                      <svg id="sell-2"
                         width="144"
                         height="56"
                         viewBox="0 0 144 56"
@@ -384,35 +376,29 @@ export default function SellPage() {
                           <path d="M26.78 20.4l2.03-2.13a15.07 15.07 0 0 0 2.67-3.49c.47-.96.71-1.86.71-2.69 0-.68-.2-1.37-.58-2.03a3.92 3.92 0 0 0-1.53-1.53A4.56 4.56 0 0 0 27.85 8c-1.39 0-2.49.42-3.37 1.29a4.92 4.92 0 0 0-1.37 3.03l-.03.27h2.23l.03-.2c.08-.62.3-1.13.66-1.52.44-.5 1-.75 1.67-.75.65 0 1.2.2 1.61.62.42.41.63.94.63 1.57 0 .58-.19 1.23-.57 1.94-.37.7-1.1 1.59-2.22 2.72L23 21.5v.99h9.31v-2.1h-5.53zM46.45 48h1V8h-1zM55.6 34.6V20.78c0-1.04.11-2.02.34-2.93.23-.91.6-1.71 1.14-2.4a5.56 5.56 0 0 1 2.09-1.63c.86-.4 1.91-.6 3.16-.6 1.14 0 2.13.15 2.96.47a5.28 5.28 0 0 1 3.26 3.37c.26.78.38 1.63.38 2.56l-4.21 1.07c0-1-.2-1.83-.58-2.46-.38-.64-1-.95-1.85-.95-.51 0-.92.1-1.24.32-.32.2-.56.48-.73.81a3.9 3.9 0 0 0-.36 1.08c-.07.39-.1.75-.1 1.08V34.6c0 .26.03.55.08.88.06.32.18.62.34.9.17.28.4.5.71.69.3.18.7.27 1.18.27 1.6 0 2.4-1.14 2.43-3.42.72.13 1.44.25 2.17.34l2.16.3c-.05 2.11-.63 3.78-1.73 5-1.11 1.23-2.75 1.84-4.91 1.84-2.28 0-3.97-.57-5.06-1.73-1.09-1.15-1.63-2.84-1.63-5.07M76.32 25.64h1.75c1.1 0 1.92-.33 2.45-.97.53-.65.8-1.7.8-3.13 0-1.26-.26-2.25-.78-2.95-.51-.7-1.36-1.06-2.55-1.06h-1.67v8.1zM72 41.17v-27.7h6.35c2.26 0 4.03.62 5.32 1.89 1.28 1.25 1.92 3.3 1.92 6.15 0 1.74-.25 3.22-.75 4.43a5.65 5.65 0 0 1-2.63 2.85l4.04 12.38H81.9L78.34 29.7h-2.02v11.47H72zM93.2 34.57c0 .7.18 1.35.54 1.92.36.57.97.85 1.84.85.88 0 1.5-.3 1.87-.9A4 4 0 0 0 98 34.3V20.26a4.3 4.3 0 0 0-.5-2.06c-.32-.62-.95-.92-1.88-.92-.5 0-.92.11-1.23.33-.32.23-.56.5-.73.84-.17.33-.28.7-.36 1.11-.07.42-.1.79-.1 1.12v13.9zm-4.34-.05V20.58c0-1.09.13-2.08.38-2.98.26-.9.65-1.68 1.18-2.33a5.33 5.33 0 0 1 2.1-1.51c.87-.37 1.9-.55 3.1-.55 1.27 0 2.33.17 3.2.5a4.9 4.9 0 0 1 2.08 1.47c.52.63.88 1.4 1.1 2.3a13 13 0 0 1 .33 3.06v13.53c0 2.41-.54 4.24-1.63 5.48-1.08 1.23-2.8 1.85-5.12 1.85-2.34 0-4.05-.59-5.12-1.77-1.06-1.18-1.6-2.88-1.6-5.11zM104.74 13.47h4.34l.7 5.17c.21 1.7.43 3.42.67 5.17l.18 1.4.27 2.24.26 2.23.17 1.42h.18l.5-3.1.48-3.08 1.72-11.45h3.65l2.32 11.49.52 3.12.52 3.14h.13l.54-6.3.93-11.45h4.34l-3.68 27.7h-4.42l-1.86-12.01-.4-2.34-.4-2.33h-.17l-.83 4.74c-.44 2-.9 3.99-1.33 5.97-.44 1.98-.85 3.97-1.23 5.97h-4.37l-3.73-27.7zM134.86 37.1h1.82c1.05 0 1.78-.27 2.18-.83.39-.56.59-1.37.59-2.43V20.75c0-1-.2-1.8-.57-2.37-.39-.57-1.12-.85-2.2-.85h-1.82V37.1zm-4.34 4.07v-27.7h6.9a7.6 7.6 0 0 1 3.9.85 4.62 4.62 0 0 1 2 2.88c.3.99.44 2.34.45 4.05l.01 6.03c0 2.28-.01 4.24-.04 5.89a13.8 13.8 0 0 1-.5 3.9c-.51 1.57-1.31 2.64-2.41 3.22-1.1.59-2.36.88-3.78.88h-6.53z"></path>
                         </g>
                       </svg>
-                      <span className="calypso-logo__text">
+                      <span id="sellpage_span_5" className="calypso-logo__text">
                         2019 年实现速度最快的电子商务平台。
                       </span>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-1 calypso-promo__second align-center text-center">
+              <div id="sellpage_div_46" className="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-1 calypso-promo__second align-center text-center">
                 {" "}
-                <img
-                  src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/Mobile/png/Mobile_Website.png"
-                  className=" calypso-promo__image d-xl-none"
-                ></img>
-                <div className="sticky-promo__image hpc-slider hpc-slider--0 d-none d-xl-block">
+                <img id="sellpage_img_3" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/Mobile/png/Mobile_Website.png"
+                  className=" calypso-promo__image d-xl-none"></img>
+                <div id="sellpage_div_47" className="sticky-promo__image hpc-slider hpc-slider--0 d-none d-xl-block">
                   <div
                     className="hpc-slider__slide hpc-slider__slide--1"
-                    id="sticky-promo__image--1"
+                    id="sellpage_promo1_image_E9"
                   >
                     {" "}
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Website_2.png"
+                    <img id="sellpage_img_4" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Website_2.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--1"
-                    ></img>
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Website_1.png"
+                      className="hpc-slider__layer hpc-slider__layer--1"></img>
+                    <img id="sellpage_img_5" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Website_1.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--2"
-                    ></img>
+                      className="hpc-slider__layer hpc-slider__layer--2"></img>
                   </div>
                 </div>
               </div>
@@ -421,25 +407,25 @@ export default function SellPage() {
         </section>
         <section
           className="calypso-block calypso-block--EW19 calypso-block--overflow-hidden sticky-promo"
-          id="sticky-promo--2"
+          id="sellpage_promo2_section_E10"
           data-sticky-promo-id="2"
         >
-          <div className="container">
-            <div className="row calypso-promo">
-              <div className="col-12 col-md-10 offset-md-1 col-xl-5 offset-xl-0 calypso-promo__first align-center">
-                <div className="sticky-promo__block">
+          <div id="sellpage_div_48" className="container">
+            <div id="sellpage_div_49" className="row calypso-promo">
+              <div id="sellpage_div_50" className="col-12 col-md-10 offset-md-1 col-xl-5 offset-xl-0 calypso-promo__first align-center">
+                <div id="sellpage_div_51" className="sticky-promo__block">
                   <div
                     className="sticky-promo__text "
                     data-sticky-promo-id="2"
-                    id="sticky-promo__text--2"
+                    id="sellpage_promo2_text_E11"
                   >
-                    <h2 className="h1">在社交媒体上销售</h2>
-                    <p>
+                    <h2 id="sellpage_h2_2" className="h1">在社交媒体上销售</h2>
+                    <p id="sellpage_p_3">
                       将社交分享转变为社交销售。在 Facebook 和 Instagram Feed
                       上轻松添加和销售商品，让买家从他们喜欢的社交媒体渠道浏览和购买商品。
                     </p>
-                    <div className="calypso-logo calypso-logo--large">
-                      <svg
+                    <div id="sellpage_div_52" className="calypso-logo calypso-logo--large">
+                      <svg id="sell-3"
                         width="168"
                         height="56"
                         viewBox="0 0 168 56"
@@ -452,8 +438,8 @@ export default function SellPage() {
                           fillRule="nonzero"
                         ></path>
                       </svg>
-                      <span className="calypso-logo__sep"></span>
-                      <svg
+                      <span id="sellpage_span_6" className="calypso-logo__sep"></span>
+                      <svg id="sell-4"
                         width="168"
                         height="56"
                         viewBox="0 0 168 56"
@@ -470,33 +456,25 @@ export default function SellPage() {
                   </div>
                 </div>
               </div>
-              <div className="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-1 calypso-promo__second align-center text-center">
+              <div id="sellpage_div_53" className="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-1 calypso-promo__second align-center text-center">
                 {" "}
-                <img
-                  src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/Mobile/png/Mobile_Social Network.png"
-                  className=" calypso-promo__image d-xl-none"
-                ></img>
-                <div className="sticky-promo__image hpc-slider hpc-slider--0 d-none d-xl-block">
+                <img id="sellpage_img_6" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/Mobile/png/Mobile_Social Network.png"
+                  className=" calypso-promo__image d-xl-none"></img>
+                <div id="sellpage_div_54" className="sticky-promo__image hpc-slider hpc-slider--0 d-none d-xl-block">
                   <div
                     className="hpc-slider__slide hpc-slider__slide--2"
-                    id="sticky-promo__image--2"
+                    id="sellpage_promo2_image_E12"
                   >
                     {" "}
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Social Network_3.png"
+                    <img id="sellpage_img_7" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Social Network_3.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--1"
-                    ></img>
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Social Network_2.png"
+                      className="hpc-slider__layer hpc-slider__layer--1"></img>
+                    <img id="sellpage_img_8" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Social Network_2.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--2"
-                    ></img>
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Social Network_1.png"
+                      className="hpc-slider__layer hpc-slider__layer--2"></img>
+                    <img id="sellpage_img_9" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Social Network_1.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--3"
-                    ></img>
+                      className="hpc-slider__layer hpc-slider__layer--3"></img>
                   </div>
                 </div>
               </div>
@@ -505,26 +483,26 @@ export default function SellPage() {
         </section>
         <section
           className="calypso-block calypso-block--EW19 calypso-block--overflow-hidden sticky-promo"
-          id="sticky-promo--3"
+          id="sellpage_promo3_section_E13"
           data-sticky-promo-id="3"
         >
-          <div className="container">
-            <div className="row calypso-promo">
-              <div className="col-12 col-md-10 offset-md-1 col-xl-5 offset-xl-0 calypso-promo__first align-center">
-                <div className="sticky-promo__block">
+          <div id="sellpage_div_55" className="container">
+            <div id="sellpage_div_56" className="row calypso-promo">
+              <div id="sellpage_div_57" className="col-12 col-md-10 offset-md-1 col-xl-5 offset-xl-0 calypso-promo__first align-center">
+                <div id="sellpage_div_58" className="sticky-promo__block">
                   <div
                     className="sticky-promo__text "
                     data-sticky-promo-id="3"
-                    id="sticky-promo__text--3"
+                    id="sellpage_promo3_text_E14"
                   >
-                    <h2 className="h1">在购物平台上销售</h2>
-                    <p>
+                    <h2 id="sellpage_h2_3" className="h1">在购物平台上销售</h2>
+                    <p id="sellpage_p_4">
                       分享 eBay 和 Amazon
                       购物平台整合所带来的两千亿美元蛋糕。直接从您的 Ecwid
                       信息中心面向最受欢迎的购物平台无缝销售。
                     </p>
-                    <div className="calypso-logo calypso-logo--large">
-                      <svg
+                    <div id="sellpage_div_59" className="calypso-logo calypso-logo--large">
+                      <svg id="sell-5"
                         width="128"
                         height="56"
                         viewBox="0 0 128 56"
@@ -536,8 +514,8 @@ export default function SellPage() {
                           <path d="M81.75 40.18c-.89-1.16-5.92-.56-8.17-.25-.67.08-.8-.52-.17-.95 4.03-2.89 10.59-2.03 11.35-1.08.76.95-.21 7.67-3.98 10.86-.6.47-1.14.21-.89-.43.85-2.16 2.75-6.94 1.86-8.15zM73.66 19.08v-2.82c0-.44.3-.7.7-.7h12.61c.4 0 .74.3.74.7v2.38c0 .4-.35.92-.95 1.78l-6.53 9.29c2.44-.04 5 .3 7.18 1.52.48.26.6.7.65 1.08v3c0 .43-.43.9-.91.65a14.43 14.43 0 0 0-13.32.04c-.43.22-.91-.21-.91-.65V32.5c0-.44 0-1.22.48-1.91l7.57-10.8H74.4c-.4 0-.74-.31-.74-.7zM27.67 36.57h-3.83c-.35-.05-.65-.3-.7-.65V16.3c0-.39.35-.7.74-.7h3.57c.4 0 .66.31.7.66v2.56h.09c.9-2.47 2.7-3.65 5.04-3.65 2.4 0 3.92 1.18 4.96 3.65a5.45 5.45 0 0 1 5.31-3.65A5.4 5.4 0 0 1 48 17.34c1.22 1.65.96 4.04.96 6.16v12.42c0 .39-.35.69-.74.69h-3.79c-.4-.04-.7-.35-.7-.7v-10.4c0-.83.1-2.92-.08-3.7-.3-1.3-1.13-1.69-2.26-1.69-.92 0-1.92.6-2.31 1.6-.4 1-.35 2.65-.35 3.78v10.42c0 .39-.35.69-.74.69h-3.83c-.39-.04-.7-.35-.7-.7v-10.4c0-2.18.35-5.43-2.34-5.43-2.74 0-2.66 3.12-2.66 5.42v10.42a.76.76 0 0 1-.78.65zm70.92-21.4c5.7 0 8.79 4.86 8.79 11.07 0 5.99-3.4 10.76-8.8 10.76-5.56 0-8.6-4.86-8.6-10.93-.05-6.12 3.04-10.9 8.6-10.9zm0 4.04c-2.83 0-3 3.86-3 6.25 0 2.38-.05 7.5 2.96 7.5 2.95 0 3.13-4.12 3.13-6.63 0-1.65-.09-3.65-.57-5.21-.43-1.39-1.3-1.91-2.52-1.91zm16.14 17.36h-3.83c-.39-.05-.7-.35-.7-.7V16.21a.75.75 0 0 1 .75-.65h3.56c.35 0 .61.26.7.57v3h.09c1.08-2.7 2.56-3.96 5.22-3.96 1.7 0 3.4.61 4.48 2.3 1 1.57 1 4.21 1 6.12v12.37c-.04.35-.35.6-.74.6h-3.83c-.35-.04-.65-.3-.7-.6V25.28c0-2.17.27-5.29-2.39-5.29-.91 0-1.78.6-2.22 1.56a8.99 8.99 0 0 0-.6 3.73v10.6a.8.8 0 0 1-.79.69zm-47.25-.05a.79.79 0 0 1-.91.09c-1.26-1.04-1.53-1.56-2.22-2.56-2.09 2.13-3.61 2.78-6.31 2.78-3.22 0-5.74-2-5.74-5.95a6.5 6.5 0 0 1 4.09-6.25c2.08-.9 5-1.08 7.22-1.34v-.48c0-.91.09-2-.48-2.78-.48-.7-1.35-1-2.13-1-1.48 0-2.79.74-3.1 2.3-.08.35-.3.7-.64.7l-3.7-.4c-.3-.08-.65-.3-.57-.77.87-4.51 4.92-5.86 8.57-5.86 1.87 0 4.31.48 5.79 1.9 1.87 1.74 1.7 4.09 1.7 6.6v5.95c0 1.78.74 2.56 1.43 3.56.26.35.3.78 0 1-.82.65-2.22 1.86-3 2.51zm-3.87-9.33v-.82c-2.79 0-5.7.6-5.7 3.86 0 1.65.87 2.78 2.35 2.78 1.09 0 2.04-.65 2.65-1.74.74-1.34.7-2.6.7-4.08zm-46.43 9.33a.79.79 0 0 1-.9.09c-1.27-1.04-1.53-1.56-2.23-2.56-2.09 2.13-3.6 2.78-6.3 2.78-3.23 0-5.75-2-5.75-5.95a6.5 6.5 0 0 1 4.09-6.25c2.09-.9 5-1.08 7.22-1.34v-.48c0-.91.09-2-.48-2.78-.47-.7-1.35-1-2.13-1-1.48 0-2.78.74-3.09 2.3-.08.35-.3.7-.65.7l-3.7-.4c-.3-.08-.65-.3-.56-.77C3.57 16.35 7.6 15 11.27 15c1.87 0 4.3.48 5.78 1.9 1.87 1.74 1.7 4.09 1.7 6.6v5.95c0 1.78.74 2.56 1.44 3.56.26.35.3.78 0 1-.83.65-2.22 1.86-3 2.51zm-3.82-9.33v-.82c-2.79 0-5.7.6-5.7 3.86 0 1.65.87 2.78 2.35 2.78 1.08 0 2.04-.65 2.65-1.74.74-1.34.7-2.6.7-4.08z"></path>
                         </g>
                       </svg>
-                      <span className="calypso-logo__sep"></span>
-                      <svg
+                      <span id="sellpage_span_7" className="calypso-logo__sep"></span>
+                      <svg id="sell-6"
                         width="104"
                         height="56"
                         viewBox="0 0 104 56"
@@ -553,33 +531,25 @@ export default function SellPage() {
                   </div>
                 </div>
               </div>
-              <div className="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-1 calypso-promo__second align-center text-center">
+              <div id="sellpage_div_60" className="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-1 calypso-promo__second align-center text-center">
                 {" "}
-                <img
-                  src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/Mobile/png/Mobile_Marketplaces.png"
-                  className=" calypso-promo__image d-xl-none"
-                ></img>
-                <div className="sticky-promo__image hpc-slider hpc-slider--0 d-none d-xl-block">
+                <img id="sellpage_img_10" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/Mobile/png/Mobile_Marketplaces.png"
+                  className=" calypso-promo__image d-xl-none"></img>
+                <div id="sellpage_div_61" className="sticky-promo__image hpc-slider hpc-slider--0 d-none d-xl-block">
                   <div
                     className="hpc-slider__slide hpc-slider__slide--3"
-                    id="sticky-promo__image--3"
+                    id="sellpage_promo3_image_E15"
                   >
                     {" "}
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Marketplaces_3.png"
+                    <img id="sellpage_img_11" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Marketplaces_3.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--1"
-                    ></img>
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Marketplaces_2.png"
+                      className="hpc-slider__layer hpc-slider__layer--1"></img>
+                    <img id="sellpage_img_12" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Marketplaces_2.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--2"
-                    ></img>
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Marketplaces_1.png"
+                      className="hpc-slider__layer hpc-slider__layer--2"></img>
+                    <img id="sellpage_img_13" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_Marketplaces_1.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--3"
-                    ></img>
+                      className="hpc-slider__layer hpc-slider__layer--3"></img>
                   </div>
                 </div>
               </div>
@@ -588,20 +558,20 @@ export default function SellPage() {
         </section>
         <section
           className="calypso-block calypso-block--EW19 calypso-block--overflow-hidden sticky-promo"
-          id="sticky-promo--4"
+          id="sellpage_promo4_section_E16"
           data-sticky-promo-id="4"
         >
-          <div className="container">
-            <div className="row calypso-promo">
-              <div className="col-12 col-md-10 offset-md-1 col-xl-5 offset-xl-0 calypso-promo__first align-center">
-                <div className="sticky-promo__block">
+          <div id="sellpage_div_62" className="container">
+            <div id="sellpage_div_63" className="row calypso-promo">
+              <div id="sellpage_div_64" className="col-12 col-md-10 offset-md-1 col-xl-5 offset-xl-0 calypso-promo__first align-center">
+                <div id="sellpage_div_65" className="sticky-promo__block">
                   <div
                     className="sticky-promo__text "
                     data-sticky-promo-id="4"
-                    id="sticky-promo__text--4"
+                    id="sellpage_promo4_text_E17"
                   >
-                    <h2 className="h1">线上、店内和移动销售</h2>
-                    <p>
+                    <h2 id="sellpage_h2_4" className="h1">线上、店内和移动销售</h2>
+                    <p id="sellpage_p_5">
                       通过 Square
                       和 种其他销售终端系统接受店内和移动付款。最重要的是，存货水平会在您的
                       Ecwid 帐户中自动更新，这样，所有店铺都能完美同步。
@@ -609,169 +579,143 @@ export default function SellPage() {
                   </div>
                 </div>
               </div>
-              <div className="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-1 calypso-promo__second align-center text-center">
+              <div id="sellpage_div_66" className="col-12 col-md-10 offset-md-1 col-xl-6 offset-xl-1 calypso-promo__second align-center text-center">
                 {" "}
-                <img
-                  src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/Mobile/png/Mobile_POS.png"
-                  className=" calypso-promo__image d-xl-none"
-                ></img>
-                <div className="sticky-promo__image hpc-slider hpc-slider--0 d-none d-xl-block">
+                <img id="sellpage_img_14" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/Mobile/png/Mobile_POS.png"
+                  className=" calypso-promo__image d-xl-none"></img>
+                <div id="sellpage_div_67" className="sticky-promo__image hpc-slider hpc-slider--0 d-none d-xl-block">
                   <div
                     className="hpc-slider__slide hpc-slider__slide--4"
-                    id="sticky-promo__image--4"
+                    id="sellpage_promo4_image_E18"
                   >
                     {" "}
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_POS_1.png"
+                    <img id="sellpage_img_15" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_POS_1.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--1"
-                    ></img>
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_POS_2.png"
+                      className="hpc-slider__layer hpc-slider__layer--1"></img>
+                    <img id="sellpage_img_16" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_sliders/Slider_POS_2.png"
                       alt=""
-                      className="hpc-slider__layer hpc-slider__layer--2"
-                    ></img>
+                      className="hpc-slider__layer hpc-slider__layer--2"></img>
                   </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
-        <section className="calypso-block calypso-block--b0 calypso-block--overflow-hidden calypso-block--EW19">
-          <div className="container">
-            <div className="row">
-              <div className="col-12">
-                <h2 className="h1">商家如何使用 Ecwid</h2>
+        <section id="sellpage_section_1" className="calypso-block calypso-block--b0 calypso-block--overflow-hidden calypso-block--EW19">
+          <div id="sellpage_div_68" className="container">
+            <div id="sellpage_div_69" className="row">
+              <div id="sellpage_div_70" className="col-12">
+                <h2 id="sellpage_h2_5" className="h1">商家如何使用 Ecwid</h2>
               </div>
             </div>
           </div>
-          <div className="calypso-showcase">
-            <div className="calypso-showcase__item">
-              <div className="container">
-                <div className="calypso-showcase__item-container">
+          <div id="sellpage_div_71" className="calypso-showcase">
+            <div id="sellpage_div_72" className="calypso-showcase__item">
+              <div id="sellpage_div_73" className="container">
+                <div id="sellpage_div_74" className="calypso-showcase__item-container">
                   {" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Hermanitos_Web.png"
-                    className=" calypso-showcase__image calypso-showcase__image-web"
-                  ></img>{" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Hermanitos_FB.png"
-                    className=" calypso-showcase__image calypso-showcase__image-fb"
-                  ></img>{" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Hermanitos_Insta.png"
-                    className=" calypso-showcase__image calypso-showcase__image-in"
-                  ></img>
+                  <img id="sellpage_img_17" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Hermanitos_Web.png"
+                    className=" calypso-showcase__image calypso-showcase__image-web"></img>{" "}
+                  <img id="sellpage_img_18" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Hermanitos_FB.png"
+                    className=" calypso-showcase__image calypso-showcase__image-fb"></img>{" "}
+                  <img id="sellpage_img_19" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Hermanitos_Insta.png"
+                    className=" calypso-showcase__image calypso-showcase__image-in"></img>
                 </div>
               </div>
             </div>
-            <div className="calypso-showcase__item">
-              <div className="container">
-                <div className="calypso-showcase__item-container">
+            <div id="sellpage_div_75" className="calypso-showcase__item">
+              <div id="sellpage_div_76" className="container">
+                <div id="sellpage_div_77" className="calypso-showcase__item-container">
                   {" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/ATOD_Web.png"
-                    className=" calypso-showcase__image calypso-showcase__image-web"
-                  ></img>{" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/ATOD_FB.png"
-                    className=" calypso-showcase__image calypso-showcase__image-fb"
-                  ></img>{" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/ATOD_Insta.png"
-                    className=" calypso-showcase__image calypso-showcase__image-in"
-                  ></img>
+                  <img id="sellpage_img_20" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/ATOD_Web.png"
+                    className=" calypso-showcase__image calypso-showcase__image-web"></img>{" "}
+                  <img id="sellpage_img_21" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/ATOD_FB.png"
+                    className=" calypso-showcase__image calypso-showcase__image-fb"></img>{" "}
+                  <img id="sellpage_img_22" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/ATOD_Insta.png"
+                    className=" calypso-showcase__image calypso-showcase__image-in"></img>
                 </div>
               </div>
             </div>
-            <div className="calypso-showcase__item">
-              <div className="container">
-                <div className="calypso-showcase__item-container">
+            <div id="sellpage_div_78" className="calypso-showcase__item">
+              <div id="sellpage_div_79" className="container">
+                <div id="sellpage_div_80" className="calypso-showcase__item-container">
                   {" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Ottica_Web.png"
-                    className=" calypso-showcase__image calypso-showcase__image-web"
-                  ></img>{" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Ottica_FB.png"
-                    className=" calypso-showcase__image calypso-showcase__image-fb"
-                  ></img>{" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Ottica_Insta.png"
-                    className=" calypso-showcase__image calypso-showcase__image-in"
-                  ></img>
+                  <img id="sellpage_img_23" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Ottica_Web.png"
+                    className=" calypso-showcase__image calypso-showcase__image-web"></img>{" "}
+                  <img id="sellpage_img_24" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Ottica_FB.png"
+                    className=" calypso-showcase__image calypso-showcase__image-fb"></img>{" "}
+                  <img id="sellpage_img_25" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/sell/Ottica_Insta.png"
+                    className=" calypso-showcase__image calypso-showcase__image-in"></img>
                 </div>
               </div>
             </div>
           </div>{" "}
         </section>
-        <section className="calypso-block calypso-block--EW19 calypso-block--b0 calypso-background--sell">
-          <div className="container">
-            <div className="row">
-              <div className="col-12 ">
-                <h2 className="h1">向全世界销售</h2>
-                <p>
+        <section id="sellpage_section_2" className="calypso-block calypso-block--EW19 calypso-block--b0 calypso-background--sell">
+          <div id="sellpage_div_81" className="container">
+            <div id="sellpage_div_82" className="row">
+              <div id="sellpage_div_83" className="col-12 ">
+                <h2 id="sellpage_h2_6" className="h1">向全世界销售</h2>
+                <p id="sellpage_p_6">
                   通过内置的国际付款工具和
                   50 种语言的翻译支持以及盘点系统，让您的小型企业全球化。
                 </p>
               </div>
             </div>
-            <div className="row global-countries text-center text-md-left">
-              <div className="col-12 col-lg-4">
-                <div className="global-countries__container">
-                  <div className="global-countries__number">
+            <div id="sellpage_div_84" className="row global-countries text-center text-md-left">
+              <div id="sellpage_div_85" className="col-12 col-lg-4">
+                <div id="sellpage_div_86" className="global-countries__container">
+                  <div id="sellpage_div_87" className="global-countries__number">
                     70<sup className="global-countries__plus">+</sup>
                   </div>
-                  <p className="">40+ 支付网关</p>
+                  <p id="sellpage_p_7" className="">40+ 支付网关</p>
                 </div>
               </div>
-              <div className="col-12 col-lg-4">
-                <div className="global-countries__container">
-                  <div className="global-countries__number">175</div>
-                  <p className="">175 国家/地区</p>
+              <div id="sellpage_div_88" className="col-12 col-lg-4">
+                <div id="sellpage_div_89" className="global-countries__container">
+                  <div id="sellpage_div_90" className="global-countries__number">175</div>
+                  <p id="sellpage_p_8" className="">175 国家/地区</p>
                 </div>
               </div>
-              <div className="col-12 col-lg-4">
-                <div className="global-countries__container">
-                  <div className="global-countries__number">50</div>
-                  <p className="">50 语言</p>
+              <div id="sellpage_div_91" className="col-12 col-lg-4">
+                <div id="sellpage_div_92" className="global-countries__container">
+                  <div id="sellpage_div_93" className="global-countries__number">50</div>
+                  <p id="sellpage_p_9" className="">50 语言</p>
                 </div>
               </div>
             </div>
           </div>
         </section>
-        <section className="calypso-block calypso-block--EW19 ">
-          <div className="container">
-            <div className="row">
-              <div className="col-12 col-lg-10 offset-lg-1 text-center ">
-                <h4 className="text-gray text-normal">
+        <section id="sellpage_section_3" className="calypso-block calypso-block--EW19 ">
+          <div id="sellpage_div_94" className="container">
+            <div id="sellpage_div_95" className="row">
+              <div id="sellpage_div_96" className="col-12 col-lg-10 offset-lg-1 text-center ">
+                <h4 id="sellpage_h4_2" className="text-gray text-normal">
                   只需几分钟即可创建在线店铺
                 </h4>
-                <h2 className="h1">在线销售所需的一切事务</h2>
-                <div className="btn-block calypso-block__btn-block text-center">
+                <h2 id="sellpage_h2_7" className="h1">在线销售所需的一切事务</h2>
+                <div id="sellpage_div_97" className="btn-block calypso-block__btn-block text-center">
                   {" "}
-                  <a
-                    href="https://my.ecwid.com/cp/#register"
+                  <a id="sellpage_a_18" href="https://my.ecwid.com/cp/#register"
                     className="btn btn--black btn--large btn--shadow cta-signup"
                     target="_blank"
-                    rel="nofollow noopener"
-                  >
+                    rel="nofollow noopener">
                     开始
                   </a>
-                  <div className="text-gray text-small"></div>
+                  <div id="sellpage_div_98" className="text-gray text-small"></div>
                 </div>
               </div>
             </div>
           </div>
         </section>{" "}
       </div>
-      <div className="calypso-page footer notranslate">
-        <section className="calypso-block calypso-block--b0">
-          <div className="container footer-menu">
-            <div className="row">
-              <div className="col-12 col-md-2">
-                <a href="https://www.ecwid.com" className="footer-menu__logo">
-                  <svg
+      <div id="sellpage_footer_E19" className="calypso-page footer notranslate">
+        <section id="sellpage_section_4" className="calypso-block calypso-block--b0">
+          <div id="sellpage_div_99" className="container footer-menu">
+            <div id="sellpage_div_100" className="row">
+              <div id="sellpage_div_101" className="col-12 col-md-2">
+                <a id="sellpage_a_19" href="https://www.ecwid.com" className="footer-menu__logo">
+                  <svg id="sell-7"
                     enableBackground="new 0 0 1600 477"
                     viewBox="0 0 1600 477"
                     xmlns="http://www.w3.org/2000/svg"
@@ -804,39 +748,39 @@ export default function SellPage() {
                   </svg>
                 </a>
               </div>
-              <div className="col-12 col-md-2 ">
-                <p className="footer-menu__section">Ecwid</p>
-                <ul>
-                  <li>
-                    <a href="/">Ecwid.com</a>
+              <div id="sellpage_div_102" className="col-12 col-md-2 ">
+                <p id="sellpage_p_10" className="footer-menu__section">Ecwid</p>
+                <ul id="sellpage_ul_3">
+                  <li id="sellpage_li_6">
+                    <a id="sellpage_a_20" href="/">Ecwid.com</a>
                   </li>
-                  <li>
-                    <a href="https://support.ecwid.com/">帮助中心</a>
+                  <li id="sellpage_li_7">
+                    <a id="sellpage_a_21" href="https://support.ecwid.com/">帮助中心</a>
                   </li>
                 </ul>
               </div>
-              <div className="col-12 col-md-2 ">
-                <p className="footer-menu__section">在线销售</p>
-                <ul>
-                  <li>
-                    <a href="/zh-CN/sell">到处销售</a>
+              <div id="sellpage_div_103" className="col-12 col-md-2 ">
+                <p id="sellpage_p_11" className="footer-menu__section">在线销售</p>
+                <ul id="sellpage_ul_4">
+                  <li id="sellpage_li_8">
+                    <a id="sellpage_a_22" href="/sell">到处销售</a>
                   </li>
-                  <li>
-                    <a href="/zh-CN/facebook">在 Facebook 上销售</a>
+                  <li id="sellpage_li_9">
+                    <a id="sellpage_a_23" href="/facebook">在 Facebook 上销售</a>
                   </li>
                 </ul>
               </div>
             </div>
-            <div className="row">
-              <div className="col-12 offset-md-2 col-md-5 col-lg-3">
-                <div className="footer-menu__search">
+            <div id="sellpage_div_104" className="row">
+              <div id="sellpage_div_105" className="col-12 offset-md-2 col-md-5 col-lg-3">
+                <div id="sellpage_div_106" className="footer-menu__search">
                   <form
                     method="get"
                     className="footer-menu__search-form"
                     id="search"
                     action="/search"
                   >
-                    <div className="blog-search-box__container">
+                    <div id="sellpage_div_107" className="blog-search-box__container">
                       <input
                         type="text"
                         className="footer-menu__search-input"
@@ -846,13 +790,11 @@ export default function SellPage() {
                         placeholder="Search"
                         title="Search"
                       ></input>
-                      <button
-                        type="submit"
+                      <button id="sellpage_button_1" type="submit"
                         className="footer-menu__search-submit"
                         value="Search"
-                        aria-label="Search"
-                      >
-                        <svg
+                        aria-label="Search">
+                        <svg id="sell-8"
                           xmlns="http://www.w3.org/2000/svg"
                           width="24"
                           height="24"
@@ -877,7 +819,7 @@ export default function SellPage() {
                       </button>
                     </div>
                   </form>
-                  <div className="footer-menu__search-loader">
+                  <div id="sellpage_div_108" className="footer-menu__search-loader">
                     <svg
                       xmlSpace="preserve"
                       enableBackground="new 0 0 44 44"
@@ -901,139 +843,115 @@ export default function SellPage() {
                   </div>
                 </div>
               </div>
-              <div className="col-12 offset-lg-2 col-md-5">
-                <ul className="footer-menu__social-icons">
-                  <li>
-                    <a
-                      href="https://www.ecwid.com/blog"
+              <div id="sellpage_div_109" className="col-12 offset-lg-2 col-md-5">
+                <ul id="sellpage_ul_5" className="footer-menu__social-icons">
+                  <li id="sellpage_li_10">
+                    <a id="sellpage_a_24" href="https://www.ecwid.com/blog"
                       className="icon-blog"
-                      title="Ecwid blog"
-                    ></a>
+                      title="Ecwid blog"></a>
                   </li>
-                  <li>
-                    <a
-                      href="https://www.ecwid.com/blog/podcast"
+                  <li id="sellpage_li_11">
+                    <a id="sellpage_a_25" href="https://www.ecwid.com/blog/podcast"
                       className="icon-podcast"
-                      title="Ecwid podcast"
-                    ></a>
+                      title="Ecwid podcast"></a>
                   </li>
-                  <li>
-                    <a
-                      href="https://www.pinterest.com/ecwid"
+                  <li id="sellpage_li_12">
+                    <a id="sellpage_a_26" href="https://www.pinterest.com/ecwid"
                       className="icon-pinterest"
                       target="_blank"
                       rel="nofollow noopener"
-                      title="Pinterest"
-                    >
-                      <span className="sr-visible">(opens in new window)</span>
+                      title="Pinterest">
+                      <span id="sellpage_span_8" className="sr-visible">(opens in new window)</span>
                     </a>
                   </li>
-                  <li>
-                    <a
-                      href="https://www.facebook.com/ecwid"
+                  <li id="sellpage_li_13">
+                    <a id="sellpage_a_27" href="https://www.facebook.com/ecwid"
                       className="icon-facebook"
                       target="_blank"
                       rel="nofollow noopener"
-                      title="Facebook"
-                    >
-                      <span className="sr-visible">(opens in new window)</span>
+                      title="Facebook">
+                      <span id="sellpage_span_9" className="sr-visible">(opens in new window)</span>
                     </a>
                   </li>
-                  <li>
-                    <a
-                      href="https://x.com/ecwid"
+                  <li id="sellpage_li_14">
+                    <a id="sellpage_a_28" href="https://x.com/ecwid"
                       className="icon-twitter"
                       target="_blank"
                       rel="nofollow noopener"
-                      title="Twitter"
-                    >
-                      <span className="sr-visible">(opens in new window)</span>
+                      title="Twitter">
+                      <span id="sellpage_span_10" className="sr-visible">(opens in new window)</span>
                     </a>
                   </li>
-                  <li>
-                    <a
-                      href="https://www.instagram.com/ecwid/"
+                  <li id="sellpage_li_15">
+                    <a id="sellpage_a_29" href="https://www.instagram.com/ecwid/"
                       className="icon-instagram"
                       target="_blank"
                       rel="nofollow noopener"
-                      title="Instagram"
-                    >
-                      <span className="sr-visible">(opens in new window)</span>
+                      title="Instagram">
+                      <span id="sellpage_span_11" className="sr-visible">(opens in new window)</span>
                     </a>
                   </li>
-                  <li>
-                    <a
-                      href="https://www.youtube.com/user/EcwidTeam"
+                  <li id="sellpage_li_16">
+                    <a id="sellpage_a_30" href="https://www.youtube.com/user/EcwidTeam"
                       className="icon-youtube"
                       target="_blank"
                       rel="nofollow noopener"
-                      title="Youtube"
-                    >
-                      <span className="sr-visible">(opens in new window)</span>
+                      title="Youtube">
+                      <span id="sellpage_span_12" className="sr-visible">(opens in new window)</span>
                     </a>
                   </li>
                 </ul>
-                <div className="footer-menu__badges">
-                  <a
-                    href="https://apps.apple.com/us/app/ecwid-ecommerce/id626731456?mt=8"
+                <div id="sellpage_div_110" className="footer-menu__badges">
+                  <a id="sellpage_a_31" href="https://apps.apple.com/us/app/ecwid-ecommerce/id626731456?mt=8"
                     target="_blank"
-                    rel="nofollow noopener"
-                  >
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/badges/black-app-store.svg"
+                    rel="nofollow noopener">
+                    <img id="sellpage_img_26" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/badges/black-app-store.svg"
                       alt="Available on the App Store"
                       width="auto"
-                      height="auto"
-                    ></img>{" "}
-                    <span className="sr-visible">(opens in new window)</span>
+                      height="auto"></img>{" "}
+                    <span id="sellpage_span_13" className="sr-visible">(opens in new window)</span>
                   </a>
-                  <a
+                  <a id="sell-9"
                     href="https://play.google.com/store/apps/details?id=com.ecwid.android"
                     target="_blank"
                     rel="nofollow noopener"
                   >
-                    <img
-                      src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/badges/black-google.svg"
+                    <img id="sellpage_img_27" src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/badges/black-google.svg"
                       alt="Get it on Google play"
                       width="auto"
-                      height="auto"
-                    ></img>{" "}
-                    <span className="sr-visible">(opens in new window)</span>
+                      height="auto"></img>{" "}
+                    <span id="sellpage_span_14" className="sr-visible">(opens in new window)</span>
                   </a>
                 </div>
               </div>
             </div>
-            <div className="row footer-menu__copyright">
-              <div className="col-12 footer-menu__copyright-wrap">
-                <span className="footer-menu__copy">
+            <div id="sellpage_div_111" className="row footer-menu__copyright">
+              <div id="sellpage_div_112" className="col-12 footer-menu__copyright-wrap">
+                <span id="sellpage_span_15" className="footer-menu__copy">
                   © 2026 Ecwid by Lightspeed
                 </span>
-                <ul className="footer-lowermenu">
-                  <li>
-                    <a
-                      href="https://www.lightspeedhq.com/legal/privacy-policy/"
+                <ul id="sellpage_ul_6" className="footer-lowermenu">
+                  <li id="sellpage_li_17">
+                    <a id="sellpage_a_32" href="https://www.lightspeedhq.com/legal/privacy-policy/"
                       target="_blank"
-                      rel="noopener nofollow"
-                    >
+                      rel="noopener nofollow">
                       Privacy Policy
                     </a>
                   </li>
-                  <li>
-                    <a
-                      href="https://www.lightspeedhq.com/legal/data-processing-agreement/"
+                  <li id="sellpage_li_18">
+                    <a id="sellpage_a_33" href="https://www.lightspeedhq.com/legal/data-processing-agreement/"
                       target="_blank"
-                      rel="noopener nofollow"
-                    >
+                      rel="noopener nofollow">
                       DPA
                     </a>
                   </li>
-                  <li>
-                    <a href="https://www.lightspeedhq.com/legal/lightspeed-service-agreement/">
+                  <li id="sellpage_li_19">
+                    <a id="sellpage_a_34" href="https://www.lightspeedhq.com/legal/lightspeed-service-agreement/">
                       Terms of Service
                     </a>
                   </li>
-                  <li>
-                    <a href="https://www.lightspeedhq.com/legal/intellectual-property-infringement-policy">
+                  <li id="sellpage_li_20">
+                    <a id="sellpage_a_35" href="https://www.lightspeedhq.com/legal/intellectual-property-infringement-policy">
                       Copyright Policy‎
                     </a>
                   </li>
@@ -1043,6 +961,95 @@ export default function SellPage() {
           </div>
         </section>
       </div>
+
+      {/* Custom Styles */}
+      <style dangerouslySetInnerHTML={{__html: `
+        /* ── Cross-connection Animation for E9 ── */
+        #sellpage_promo1_image_E9 {
+          position: relative !important;
+          overflow: visible !important;
+          box-shadow: none !important;
+          filter: none !important;
+        }
+        
+        #sellpage_promo1_image_E9 * {
+          box-shadow: none !important;
+          filter: none !important;
+        }
+        
+        /* Base screen skeleton - slides in from top-left */
+        #sellpage_promo1_image_E9 .hpc-slider__layer--1 {
+          transform: translate3d(-60px, -20px, 0) scale(0.95) !important;
+          opacity: 0 !important;
+          transition: all 1.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          will-change: transform, opacity !important;
+          box-shadow: none !important;
+          filter: none !important;
+        }
+        
+        #sellpage_promo1_image_E9.hpc-slider__slide--active .hpc-slider__layer--1 {
+          transform: translate3d(0, 0, 0) scale(1) !important;
+          opacity: 1 !important;
+          animation: crossFloat1 6s ease-in-out infinite !important;
+          animation-delay: 1.4s !important;
+          box-shadow: none !important;
+          filter: none !important;
+        }
+        
+        /* Content elements - slides in from bottom-right */
+        #sellpage_promo1_image_E9 .hpc-slider__layer--2 {
+          transform: translate3d(60px, 20px, 0) scale(0.95) !important;
+          opacity: 0 !important;
+          transition: all 1.4s cubic-bezier(0.16, 1, 0.3, 1) !important;
+          will-change: transform, opacity !important;
+          background: transparent !important;
+          background-color: transparent !important;
+          filter: none !important;
+          box-shadow: none !important;
+        }
+        
+        #sellpage_img_5 {
+          background: transparent !important;
+          background-color: transparent !important;
+          filter: none !important;
+          box-shadow: none !important;
+        }
+        
+        #sellpage_promo1_image_E9.hpc-slider__slide--active .hpc-slider__layer--2 {
+          transform: translate3d(0, 0, 0) scale(1) !important;
+          opacity: 1 !important;
+          animation: crossFloat2 6s ease-in-out infinite !important;
+          animation-delay: 1.4s !important;
+          filter: none !important;
+          box-shadow: none !important;
+        }
+        
+        @keyframes crossFloat1 {
+          0%, 100% {
+            transform: translate3d(0, 0, 0) scale(1) !important;
+            filter: brightness(0.98) !important;
+            box-shadow: none !important;
+          }
+          50% {
+            transform: translate3d(-4px, -3px, 0) scale(1.003) !important;
+            filter: brightness(1.01) !important;
+            box-shadow: none !important;
+          }
+        }
+        
+        @keyframes crossFloat2 {
+          0%, 100% {
+            transform: translate3d(0, 0, 0) scale(1) !important;
+            filter: none !important;
+            box-shadow: none !important;
+          }
+          50% {
+            transform: translate3d(4px, 3px, 0) scale(1.005) !important;
+            filter: brightness(1.03) !important;
+            box-shadow: none !important;
+          }
+        }
+      `}} />
     </>
   );
 }
