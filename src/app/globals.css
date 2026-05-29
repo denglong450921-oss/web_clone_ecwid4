@@ -399,6 +399,13 @@ p {
   height: auto !important;
 }
 
+.calypso-menu__dropdown-item--active {
+  position: relative !important;
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
 /* ── REGISTER / sign-up page ── */
 .wj_registration, .cp-reg {
   min-height: 100vh;
