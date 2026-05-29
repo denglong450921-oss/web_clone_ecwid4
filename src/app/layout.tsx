@@ -20,7 +20,7 @@ export default function RootLayout({
         <link href="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/calypso.d1385ee4.css" rel="stylesheet" />
         <style>{`
           /* Inline styles from head */
-          .lazyload, .lazyloading { opacity: 1 !important; transform: none !important; visibility: visible !important; }
+          .lazyload, .lazyloading, .lazy-load { opacity: 1 !important; transform: none !important; visibility: visible !important; }
 
           .wj_registration-overlay {z-index: 1000000000 !important;}
           .embed {
