@@ -1,1 +1,37 @@
+/* Force tabbar menu links to show up and be visible on all pages */
+@media(min-width: 992px) {
+  .calypso-menu .calypso-menu__item,
+  .calypso-menu .calypso-menu__item--dropdown {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  .calypso-menu a.calypso-menu__link {
+    display: inline-block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    color: #303030; /* Ensure text is dark and visible */
+  }
 
+  /* Make sure the main menu container is always visible and on top */
+  .calypso-menu {
+    position: relative !important;
+    z-index: 999999 !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+}
+
+/* Ensure dropdown menus work when the hidden class is removed */
+.calypso-menu__dropdown:not(.calypso-menu__dropdown--hidden) {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: none !important;
+}
+
+/* Fix mobile menu button visibility if needed */
+.calypso-menu__button {
+  z-index: 999999 !important;
+}
