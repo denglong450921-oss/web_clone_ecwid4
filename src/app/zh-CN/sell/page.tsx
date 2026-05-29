@@ -35,14 +35,14 @@ export default function SellPage() {
           // Phones split left and right
           const moveX = Math.min(windowScrollTop * 1.5, 800);
           
-          // Move devices UP gradually as you scroll down, so they align with the description text (which is naturally 240px above them)
-          // Negative Y translation moves them UP.
-          const moveYDevice = -Math.min(windowScrollTop * 0.8, 260);
+          // Make devices sticky by moving them DOWN as we scroll DOWN.
+          // This allows the text originally below them to catch up and perfectly center between them.
+          const moveYDevice = Math.min(windowScrollTop * 0.9, 450);
           
           phone.style.transform = `translate3d(-${moveX}px, ${moveYDevice}px, 0)`;
           tablet.style.transform = `translate3d(${moveX}px, ${moveYDevice}px, 0)`;
           
-          // The description text stays in place and just scrolls normally
+          // The description text stays in place and just scrolls normally up from below
           heroDescr.style.transform = 'none';
           
           phone.style.transition = 'transform 0.1s ease-out';
@@ -51,8 +51,10 @@ export default function SellPage() {
       } else {
         const phone = document.querySelector('.sell-hero__phone');
         const tablet = document.querySelector('.sell-hero__tablet');
+        const heroDescr = document.querySelector('.sell-hero__descr');
         if(phone) { phone.style.transform = 'none'; phone.style.transition = 'none'; }
         if(tablet) { tablet.style.transform = 'none'; tablet.style.transition = 'none'; }
+        if(heroDescr) { heroDescr.style.transform = 'none'; heroDescr.style.transition = 'none'; }
       }
     };
 
@@ -298,6 +300,22 @@ export default function SellPage() {
                 <h1>在线销售所需的一切事务</h1>
               </div>
             </div>
+            <div className="row sell-hero__block calypso-block__image">
+              <div className="col-12">
+                <div className="sell-hero__tablet">
+                  {" "}
+                  <img
+                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_content/Tab_Website.png"
+                    className=""></img>
+                </div>
+                <div className="sell-hero__phone">
+                  {" "}
+                  <img
+                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_content/Phone_Website.png"
+                    className=""></img>
+                </div>
+              </div>
+            </div>
             <div className="row sell-hero__descr">
               <div className="col-12 col-md-10 offset-md-1 col-lg-8 offset-lg-2 col-xl-6 offset-xl-3">
                 <p className="">
@@ -315,22 +333,6 @@ export default function SellPage() {
                     开始
                   </a>
                   <div className="text-small text-gray"></div>
-                </div>
-              </div>
-            </div>
-            <div className="row sell-hero__block calypso-block__image">
-              <div className="col-12">
-                <div className="sell-hero__tablet">
-                  {" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_content/Tab_Website.png"
-                    className=""></img>
-                </div>
-                <div className="sell-hero__phone">
-                  {" "}
-                  <img
-                    src="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_content/Phone_Website.png"
-                    className=""></img>
                 </div>
               </div>
             </div>
