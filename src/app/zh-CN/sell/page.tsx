@@ -785,7 +785,7 @@ export default function SellPage() {
                       <input
                         type="text"
                         className="footer-menu__search-input"
-                        value=""
+                        defaultValue=""
                         name="q"
                         id="q"
                         placeholder="Search"
