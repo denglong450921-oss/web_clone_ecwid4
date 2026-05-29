@@ -30,21 +30,31 @@ export default function SellPage() {
         const phone = document.querySelector('.sell-hero__phone');
         const tablet = document.querySelector('.sell-hero__tablet');
         const heroDescr = document.querySelector('.sell-hero__descr');
+        const heroHeader = document.querySelector('.sell-hero__container > .row:first-child');
         
-        if (phone && tablet && heroDescr) {
+        if (phone && tablet && heroDescr && heroHeader) {
+          // Limit the animation to a max scroll of 400px so it stops and then scrolls off naturally
+          const animScroll = Math.min(windowScrollTop, 400);
+          
+          // Sticky effect: pin them to the screen
+          const stickyY = animScroll;
+          
+          // Header stays pinned completely during animation
+          heroHeader.style.transform = `translate3d(0, ${stickyY}px, 0)`;
+          
           // Phones split left and right
-          const moveX = Math.min(windowScrollTop * 1.5, 800);
+          const moveX = Math.min(animScroll * 1.5, 600);
           
-          // Description text moves UP extremely fast to close the gap with the header text
-          const moveYText = -Math.min(windowScrollTop * 2.1, 700);
+          // Description text moves up relative to sticky position to close the gap
+          const descrMoveUp = Math.min(animScroll * 1.3, 500);
+          heroDescr.style.transform = `translate3d(0, ${stickyY - descrMoveUp}px, 0)`;
           
-          // Devices scroll normally (0 translation) so they don't clip into the navbar
-          const moveYDevice = 0;
+          // Devices move up slightly relative to sticky position to frame the description
+          const deviceMoveUp = Math.min(animScroll * 0.4, 160);
+          phone.style.transform = `translate3d(-${moveX}px, ${stickyY - deviceMoveUp}px, 0)`;
+          tablet.style.transform = `translate3d(${moveX}px, ${stickyY - deviceMoveUp}px, 0)`;
           
-          phone.style.transform = `translate3d(-${moveX}px, ${moveYDevice}px, 0)`;
-          tablet.style.transform = `translate3d(${moveX}px, ${moveYDevice}px, 0)`;
-          heroDescr.style.transform = `translate3d(0, ${moveYText}px, 0)`;
-          
+          heroHeader.style.transition = 'transform 0.1s ease-out';
           phone.style.transition = 'transform 0.1s ease-out';
           tablet.style.transition = 'transform 0.1s ease-out';
           heroDescr.style.transition = 'transform 0.1s ease-out';
@@ -53,9 +63,11 @@ export default function SellPage() {
         const phone = document.querySelector('.sell-hero__phone');
         const tablet = document.querySelector('.sell-hero__tablet');
         const heroDescr = document.querySelector('.sell-hero__descr');
+        const heroHeader = document.querySelector('.sell-hero__container > .row:first-child');
         if(phone) { phone.style.transform = 'none'; phone.style.transition = 'none'; }
         if(tablet) { tablet.style.transform = 'none'; tablet.style.transition = 'none'; }
         if(heroDescr) { heroDescr.style.transform = 'none'; heroDescr.style.transition = 'none'; }
+        if(heroHeader) { heroHeader.style.transform = 'none'; heroHeader.style.transition = 'none'; }
       }
     };
 
