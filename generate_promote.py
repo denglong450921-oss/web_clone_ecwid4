@@ -16,19 +16,6 @@ soup = BeautifulSoup(html, "html.parser")
 for tag in soup(["script", "noscript", "iframe"]):
     tag.extract()
 
-# Add safe, custom bounce animations to all text
-for tag_name in ['h1', 'h2', 'h3', 'p', 'li', 'a']:
-    for el in soup.find_all(tag_name):
-        classes = el.get('class', [])
-        classes.append('my-bouncy-text')
-        el['class'] = classes
-
-for img in soup.find_all('img'):
-    classes = img.get('class', [])
-    if 'promote-paralax__layer' not in classes:
-        classes.append('my-bouncy-text')
-        img['class'] = classes
-
 body = soup.find("body")
 
 body_html = ""
@@ -44,13 +31,17 @@ export default function PromotePage() {{
     const observer = new IntersectionObserver((entries) => {{
       entries.forEach(entry => {{
         if (entry.isIntersecting) {{
-          entry.target.classList.add('is-visible');
-          observer.unobserve(entry.target);
+          const el = entry.target;
+          if (el.classList.contains('hpc-animate')) el.classList.add('hpc-animate--animated');
+          if (el.classList.contains('animate')) el.classList.add('animate--animated');
+          if (el.classList.contains('promote-hero')) el.classList.add('promote-hero--animated');
+          if (el.classList.contains('promote-paralax')) el.classList.add('promote-paralax--animated');
+          observer.unobserve(el);
         }}
       }});
     }}, {{ threshold: 0.1 }});
 
-    const elements = document.querySelectorAll('.my-bouncy-text, .promote-paralax');
+    const elements = document.querySelectorAll('.hpc-animate, .animate, .promote-hero, .promote-paralax');
     elements.forEach(el => observer.observe(el));
     
     return () => observer.disconnect();
@@ -58,17 +49,6 @@ export default function PromotePage() {{
 
   return (
     <>
-      <style dangerouslySetInnerHTML={{{{__html: `
-        .my-bouncy-text {{
-            opacity: 0;
-            transform: translateY(30px);
-            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }}
-        .my-bouncy-text.is-visible {{
-            opacity: 1;
-            transform: translateY(0);
-        }}
-      `}}}} />
       <div dangerouslySetInnerHTML={{{{ __html: `{body_html}` }}}} />
     </>
   );
@@ -79,4 +59,4 @@ os.makedirs("src/app/promote", exist_ok=True)
 with open("src/app/promote/page.tsx", "w") as f:
     f.write(react_code)
 
-print("Created src/app/promote/page.tsx with CUSTOM bouncy animations!")
+print("Created src/app/promote/page.tsx with 100% original animations!")
