@@ -6,8 +6,7 @@ html_file = "src/app/manage_raw.html"
 with open(html_file, "r") as f:
     html = f.read()
 
-# Fix lazy images (can be quoted or unquoted)
-# Matches data-src="..." or data-src=...
+# Fix lazy images
 html = re.sub(r'data-src="?([^" >]+)"?', r'src="\1"', html)
 html = re.sub(r'data-lazy="?([^" >]+)"?', r'src="\1"', html)
 
@@ -29,50 +28,71 @@ import {{ useEffect }} from 'react';
 
 export default function ManagePage() {{
   useEffect(() => {{
+    // Intersection Observer for scroll-based class additions
     const observer = new IntersectionObserver((entries) => {{
       entries.forEach(entry => {{
         if (entry.isIntersecting) {{
-          // Add --animated to everything that might need it
-          entry.target.classList.add(
-              'hpc-animate--animated', 
-              'animate--animated', 
-              'hpc-slider__slide--animated', 
-              'promote-hero--animated', 
-              'promote-paralax--animated',
-              'manage-hero--animated',
-              'manage-paralax--animated'
-          );
-          observer.unobserve(entry.target);
+          const el = entry.target;
+          if (el.classList.contains('animate')) el.classList.add('animate--animated');
+          observer.unobserve(el);
         }}
       }});
     }}, {{ threshold: 0.1 }});
 
-    // Observe any element that might be animated
-    const selectors = [
-        '.hpc-animate', 
-        '.animate', 
-        '.hpc-slider__slide', 
-        '.hpc-pics__bg', 
-        '.hpc-slider__layer', 
-        '.promote-hero', 
-        '.promote-paralax', 
-        '.promote-paralax__layer',
-        '.hpc-dashboard-graph',
-        '.hpc-mobile-app',
-        '.hpc-manage-shipping-image',
-        '.hpc-security-image',
-        '.hpc-logos--shippings',
-        '.hpc-logos--pyments'
-    ];
-    
-    const elements = document.querySelectorAll(selectors.join(', '));
+    const elements = document.querySelectorAll('.animate');
     elements.forEach(el => observer.observe(el));
     
-    return () => observer.disconnect();
+    // Vanilla JS implementation of calypso-animation.js parallax
+    const parallaxLayers = [
+      {{ selector: '.hpc-dashboard-graph__image-top', coeff: -0.1, relative: '.hpc-page', min_width: 320 }},
+      {{ selector: '.hpc-dashboard-graph__image-bottom', coeff: -0.1, relative: '.hpc-page', min_width: 320 }},
+      {{ selector: '.hpc-mobile-app__phone', coeff: -0.2, relative: '.hpc-mobile-app', min_width: 320 }},
+      {{ selector: '.hpc-mobile-app__notification', coeff: -0.4, relative: '.hpc-mobile-app', min_width: 320 }}
+    ];
+
+    const onScroll = () => {{
+      const windowScrollTop = window.scrollY || document.documentElement.scrollTop;
+      const windowHeight = window.innerHeight;
+      const windowBottom = windowScrollTop + windowHeight;
+      const windowWidth = window.innerWidth;
+
+      parallaxLayers.forEach(config => {{
+        const layers = document.querySelectorAll(config.selector);
+        const relativeEl = document.querySelector(config.relative);
+        
+        if (!relativeEl) return;
+
+        const relativeTop = relativeEl.getBoundingClientRect().top + window.scrollY;
+        const relativeBottom = relativeTop + relativeEl.offsetHeight;
+
+        layers.forEach(layer => {{
+          if (windowWidth >= config.min_width) {{
+            if (windowScrollTop <= relativeBottom && relativeTop < windowBottom) {{
+              const newCoord = (windowScrollTop - relativeTop) * config.coeff;
+              layer.style.transform = `translate3d(0, ${{newCoord}}px, 0px)`;
+              layer.style.transition = 'none';
+            }}
+          }} else {{
+            layer.style.transform = '';
+            layer.style.transition = '';
+          }}
+        }});
+      }});
+    }};
+
+    window.addEventListener('scroll', onScroll);
+    onScroll(); // initialize
+
+    return () => {{
+      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+    }};
   }}, []);
 
   return (
-    <div dangerouslySetInnerHTML={{{{ __html: `{body_html}` }}}} />
+    <>
+      <div dangerouslySetInnerHTML={{{{ __html: `{body_html}` }}}} />
+    </>
   );
 }}
 """
@@ -81,4 +101,4 @@ os.makedirs("src/app/manage", exist_ok=True)
 with open("src/app/manage/page.tsx", "w") as f:
     f.write(react_code)
 
-print("Created src/app/manage/page.tsx with animations")
+print("Created src/app/manage/page.tsx with 100% original animations!")
