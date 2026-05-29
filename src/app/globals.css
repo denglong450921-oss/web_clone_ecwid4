@@ -399,6 +399,10 @@ p {
   height: auto !important;
 }
 
+.calypso-menu__dropdown-container {
+  position: relative !important;
+}
+
 .calypso-menu__dropdown-item--active {
   position: relative !important;
   display: block !important;
