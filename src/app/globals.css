@@ -383,7 +383,6 @@ p {
 }
 .hpc-mobile-slider__slider::-webkit-scrollbar { display: none; }
 
-/* Ensure dropdown visible when not hidden */
 .calypso-menu__dropdown:not(.calypso-menu__dropdown--hidden) {
   opacity: 1 !important;
   visibility: visible !important;
@@ -392,6 +391,7 @@ p {
   background-color: #ffffff !important;
   border-radius: 8px !important;
   box-shadow: 0 4px 24px rgba(0, 0, 0, 0.12) !important;
+  padding: 16px 0 !important;
 }
 
 .calypso-menu__dropdown-overflow {
@@ -401,6 +401,8 @@ p {
 
 .calypso-menu__dropdown-container {
   position: relative !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
 
 .calypso-menu__dropdown-item--active {
