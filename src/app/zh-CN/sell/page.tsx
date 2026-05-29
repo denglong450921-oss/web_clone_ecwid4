@@ -26,34 +26,33 @@ export default function SellPage() {
     const onScroll = () => {
       const windowScrollTop = window.scrollY || document.documentElement.scrollTop;
       const windowWidth = window.innerWidth;
-      if (windowWidth >= 1200) {
+      if (windowWidth >= 991) {
         const phone = document.querySelector('.sell-hero__phone');
         const tablet = document.querySelector('.sell-hero__tablet');
-        const hero = document.querySelector('.sell-hero');
+        const heroDescr = document.querySelector('.sell-hero__descr');
         
-        if (hero && phone && tablet) {
-          const heroRect = hero.getBoundingClientRect();
-          // heroRect.top is the distance from viewport top
-          // when hero starts scrolling up, heroRect.top becomes negative
-          // Let's say we want them to split apart as we scroll down.
-          // In sell_anim_after, they are split when scrolled further.
+        if (phone && tablet && heroDescr) {
+          // Phones split left and right
+          const moveX = Math.min(windowScrollTop * 1.5, 800);
           
-          let scrollDelta = windowScrollTop; // absolute scroll
-          // Actually, we can just use windowScrollTop for parallax.
+          // Move devices UP gradually as you scroll down, so they align with the description text (which is naturally 240px above them)
+          // Negative Y translation moves them UP.
+          const moveYDevice = -Math.min(windowScrollTop * 0.8, 260);
           
-          // Move phone left, tablet right
-          // To match Ecwid's typical parallax speed: coeff = 0.5 or something
-          const moveX = Math.min(scrollDelta * 0.4, 300); // Max 300px
-          const moveY = scrollDelta * 0.15; // move down slightly to parallax
+          phone.style.transform = `translate3d(-${moveX}px, ${moveYDevice}px, 0)`;
+          tablet.style.transform = `translate3d(${moveX}px, ${moveYDevice}px, 0)`;
           
-          phone.style.transform = `translate3d(-${moveX}px, ${moveY}px, 0)`;
-          tablet.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
+          // The description text stays in place and just scrolls normally
+          heroDescr.style.transform = 'none';
+          
+          phone.style.transition = 'transform 0.1s ease-out';
+          tablet.style.transition = 'transform 0.1s ease-out';
         }
       } else {
         const phone = document.querySelector('.sell-hero__phone');
         const tablet = document.querySelector('.sell-hero__tablet');
-        if(phone) phone.style.transform = 'none';
-        if(tablet) tablet.style.transform = 'none';
+        if(phone) { phone.style.transform = 'none'; phone.style.transition = 'none'; }
+        if(tablet) { tablet.style.transform = 'none'; tablet.style.transition = 'none'; }
       }
     };
 
