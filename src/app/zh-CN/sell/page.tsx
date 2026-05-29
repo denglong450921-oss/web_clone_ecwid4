@@ -22,6 +22,45 @@ export default function SellPage() {
 
     document.querySelectorAll('.hpc-slider__slide, .hpc-animate').forEach(el => observer.observe(el));
     
+    
+    const onScroll = () => {
+      const windowScrollTop = window.scrollY || document.documentElement.scrollTop;
+      const windowWidth = window.innerWidth;
+      if (windowWidth >= 1200) {
+        const phone = document.querySelector('.sell-hero__phone');
+        const tablet = document.querySelector('.sell-hero__tablet');
+        const hero = document.querySelector('.sell-hero');
+        
+        if (hero && phone && tablet) {
+          const heroRect = hero.getBoundingClientRect();
+          // heroRect.top is the distance from viewport top
+          // when hero starts scrolling up, heroRect.top becomes negative
+          // Let's say we want them to split apart as we scroll down.
+          // In sell_anim_after, they are split when scrolled further.
+          
+          let scrollDelta = windowScrollTop; // absolute scroll
+          // Actually, we can just use windowScrollTop for parallax.
+          
+          // Move phone left, tablet right
+          // To match Ecwid's typical parallax speed: coeff = 0.5 or something
+          const moveX = Math.min(scrollDelta * 0.4, 300); // Max 300px
+          const moveY = scrollDelta * 0.15; // move down slightly to parallax
+          
+          phone.style.transform = `translate3d(-${moveX}px, ${moveY}px, 0)`;
+          tablet.style.transform = `translate3d(${moveX}px, ${moveY}px, 0)`;
+        }
+      } else {
+        const phone = document.querySelector('.sell-hero__phone');
+        const tablet = document.querySelector('.sell-hero__tablet');
+        if(phone) phone.style.transform = 'none';
+        if(tablet) tablet.style.transform = 'none';
+      }
+    };
+
+    window.addEventListener('scroll', onScroll);
+    window.addEventListener('resize', onScroll);
+    onScroll();
+
     // Add slick carousel for calypso-showcase if missing
     if (document.querySelector('.calypso-showcase')) {
       if (!document.getElementById('slick-js')) {
