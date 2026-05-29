@@ -173,12 +173,16 @@ p {
 
 /* ── PROMOTE page ── */
 .promote-paralax {
-  min-height: 75vh;
+  min-height: 45vh; /* Reduced from 75vh to minimize gap */
 }
 .promote-paralax__text-block {
-  padding-top: 5rem !important;
+  margin-top: 2rem;
 }
 
+/* Ensure horizontal side-by-side modules are vertically centered */
+.calypso-promo {
+  align-items: center;
+}
 /* ── FACEBOOK page: fix the hero overlap ── */
 .facebook-section-hero {
   padding-top: 2rem !important;
@@ -463,4 +467,10 @@ p {
 /* ── Remove any margin-top on the .page element ── */
 .page.calypso-page.hpc-page.no_translate {
   margin-top: 0 !important;
+}
+
+/* Fix Promote & Facebook Hero Overlap */
+section.calypso-block--background-menu {
+  padding-top: 9rem !important;
+  padding-bottom: 4rem !important;
 }
