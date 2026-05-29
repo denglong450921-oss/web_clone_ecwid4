@@ -1,0 +1,39 @@
+import type { Metadata } from "next";
+import "./globals.css";
+
+export const metadata: Metadata = {
+  title: "在 5 分钟内免费添加在线商店",
+  description:
+    "在网站、社交网站、市场（Google Shopping、Amazon Ads、eBay）同时销售商品，或使用任何设备当面出售商品。",
+};
+
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <html lang="zh-CN" dir="ltr">
+      <head>
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,700&subset=cyrillic,latin" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+        <link href="https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/calypso.d1385ee4.css" rel="stylesheet" />
+        <style>{`
+          /* Inline styles from head */
+          .lazyload, .lazyloading { opacity: 1 !important; transform: none !important; visibility: visible !important; }
+
+          .wj_registration-overlay {z-index: 1000000000 !important;}
+          .embed {
+            display: block; position: relative; z-index: 1; overflow: hidden; height: 0; margin-bottom: 48px; padding: 0; padding-bottom: 56.25%;
+          }
+          .embed iframe {
+            position: absolute; top: 0; bottom: 0; left: 0; width: 100%; height: 100%; border: 0;
+          }
+        `}</style>
+      </head>
+      <body id="p-32564" className="index-EW19">
+        {children}
+      </body>
+    </html>
+  );
+}
