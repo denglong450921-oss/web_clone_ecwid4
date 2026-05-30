@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 export default function MenuFixer() {
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     // ── 1. SCROLL ANIMATIONS ─────────────────────────────────────────────
@@ -132,6 +133,22 @@ export default function MenuFixer() {
     };
     document.addEventListener("click", closeAll);
 
+    // Intercept internal links inside the menu to perform client-side router jumps
+    const handleLinkClick = (e: MouseEvent) => {
+      const target = e.target as HTMLElement;
+      const a = target.closest("a");
+      if (a && a.href && a.href.startsWith(window.location.origin) && !a.classList.contains("calypso-menu__link")) {
+        e.preventDefault();
+        const url = new URL(a.href);
+        router.push(url.pathname + url.search + url.hash);
+        dropdowns.forEach((d) => hideDropdown(d));
+      }
+    };
+    const menuEl = document.querySelector(".calypso-menu");
+    if (menuEl) {
+      menuEl.addEventListener("click", handleLinkClick);
+    }
+
     // ── 3. MOBILE BURGER MENU ────────────────────────────────────────────
     const burger = document.querySelector<HTMLElement>(".calypso-menu__burger");
     const mobileMenu = document.querySelector<HTMLElement>(
@@ -209,6 +226,7 @@ export default function MenuFixer() {
       animObserver.disconnect();
       document.removeEventListener("click", closeAll);
       window.removeEventListener("scroll", onScroll);
+      if (menuEl) menuEl.removeEventListener("click", handleLinkClick);
     };
   }, [pathname]);
 
