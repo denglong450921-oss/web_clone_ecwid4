@@ -21,12 +21,12 @@ export default function MenuFixer() {
           }
         });
       },
-      { threshold: 0.12 }
+      { threshold: 0.12 },
     );
 
     document
       .querySelectorAll(
-        ".hpc-animate, .animate:not(.animate--mobile-only), .hpc-slider__slide, .hpc-slider__layer"
+        ".hpc-animate, .animate:not(.animate--mobile-only), .hpc-slider__slide, .hpc-slider__layer",
       )
       .forEach((el) => {
         (el as HTMLElement).style.opacity = "0";
@@ -35,21 +35,30 @@ export default function MenuFixer() {
 
     // ── 2. DESKTOP DROPDOWN HOVER ────────────────────────────────────────
     const dropdowns = document.querySelectorAll<HTMLElement>(
-      ".calypso-menu__item--dropdown"
+      ".calypso-menu__item--dropdown",
     );
 
     const showDropdown = (dropdown: HTMLElement) => {
-      const menu = dropdown.closest(".calypso-menu")?.querySelector<HTMLElement>(
-        ".calypso-menu__dropdown"
-      );
+      const menu = dropdown
+        .closest(".calypso-menu")
+        ?.querySelector<HTMLElement>(".calypso-menu__dropdown");
       if (menu) {
         menu.classList.remove("calypso-menu__dropdown--hidden");
         dropdown.classList.add("calypso-menu__item--active");
-        
+
+        // Calculate position for triangle
+        const menuRect = menu.getBoundingClientRect();
+        const itemRect = dropdown.getBoundingClientRect();
+        // The triangle should be in the center of the item, relative to the dropdown menu
+        const trianglePos = itemRect.left + itemRect.width / 2 - menuRect.left;
+        menu.style.setProperty("--triangle-left", `${trianglePos}px`);
+
         // Find the inner dropdown item and make it active
         const dataItem = dropdown.getAttribute("data-item");
         if (dataItem !== null) {
-          const innerItem = menu.querySelector<HTMLElement>(`.calypso-menu__dropdown-item--item-${dataItem}`);
+          const innerItem = menu.querySelector<HTMLElement>(
+            `.calypso-menu__dropdown-item--item-${dataItem}`,
+          );
           if (innerItem) {
             innerItem.classList.add("calypso-menu__dropdown-item--active");
           }
@@ -58,13 +67,17 @@ export default function MenuFixer() {
       // Also close all other dropdowns
       dropdowns.forEach((d) => {
         if (d !== dropdown) {
-          const m = d.closest(".calypso-menu")?.querySelector<HTMLElement>(".calypso-menu__dropdown");
+          const m = d
+            .closest(".calypso-menu")
+            ?.querySelector<HTMLElement>(".calypso-menu__dropdown");
           if (m) {
             m.classList.add("calypso-menu__dropdown--hidden");
             // deactivate inner items
-            m.querySelectorAll(".calypso-menu__dropdown-item").forEach(item => {
-              item.classList.remove("calypso-menu__dropdown-item--active");
-            });
+            m.querySelectorAll(".calypso-menu__dropdown-item").forEach(
+              (item) => {
+                item.classList.remove("calypso-menu__dropdown-item--active");
+              },
+            );
           }
           d.classList.remove("calypso-menu__item--active");
         }
@@ -72,16 +85,18 @@ export default function MenuFixer() {
     };
 
     const hideDropdown = (dropdown: HTMLElement) => {
-      const menu = dropdown.closest(".calypso-menu")?.querySelector<HTMLElement>(
-        ".calypso-menu__dropdown"
-      );
+      const menu = dropdown
+        .closest(".calypso-menu")
+        ?.querySelector<HTMLElement>(".calypso-menu__dropdown");
       if (menu) {
         menu.classList.add("calypso-menu__dropdown--hidden");
         dropdown.classList.remove("calypso-menu__item--active");
         // deactivate inner items
-        menu.querySelectorAll(".calypso-menu__dropdown-item").forEach(item => {
-          item.classList.remove("calypso-menu__dropdown-item--active");
-        });
+        menu
+          .querySelectorAll(".calypso-menu__dropdown-item")
+          .forEach((item) => {
+            item.classList.remove("calypso-menu__dropdown-item--active");
+          });
       }
     };
 
@@ -92,12 +107,12 @@ export default function MenuFixer() {
         link.addEventListener("click", (e) => {
           e.preventDefault();
           e.stopPropagation();
-          const menu = dropdown.closest(".calypso-menu")?.querySelector<HTMLElement>(
-            ".calypso-menu__dropdown"
-          );
+          const menu = dropdown
+            .closest(".calypso-menu")
+            ?.querySelector<HTMLElement>(".calypso-menu__dropdown");
           if (menu) {
             const isHidden = menu.classList.contains(
-              "calypso-menu__dropdown--hidden"
+              "calypso-menu__dropdown--hidden",
             );
             if (isHidden) showDropdown(dropdown);
             else hideDropdown(dropdown);
@@ -109,12 +124,12 @@ export default function MenuFixer() {
       dropdown.addEventListener("click", (e) => {
         if ((e.target as HTMLElement).closest(".calypso-menu__dropdown"))
           return;
-        const menu = dropdown.closest(".calypso-menu")?.querySelector<HTMLElement>(
-          ".calypso-menu__dropdown"
-        );
+        const menu = dropdown
+          .closest(".calypso-menu")
+          ?.querySelector<HTMLElement>(".calypso-menu__dropdown");
         if (menu) {
           const isHidden = menu.classList.contains(
-            "calypso-menu__dropdown--hidden"
+            "calypso-menu__dropdown--hidden",
           );
           if (isHidden) showDropdown(dropdown);
           else hideDropdown(dropdown);
@@ -134,10 +149,15 @@ export default function MenuFixer() {
     document.addEventListener("click", closeAll);
 
     // Intercept internal links inside the menu to perform client-side router jumps
-    const handleLinkClick = (e: MouseEvent) => {
+    const handleLinkClick = (e: Event) => {
       const target = e.target as HTMLElement;
       const a = target.closest("a");
-      if (a && a.href && a.href.startsWith(window.location.origin) && !a.classList.contains("calypso-menu__link")) {
+      if (
+        a &&
+        a.href &&
+        a.href.startsWith(window.location.origin) &&
+        !a.classList.contains("calypso-menu__link")
+      ) {
         e.preventDefault();
         const url = new URL(a.href);
         router.push(url.pathname + url.search + url.hash);
@@ -152,7 +172,7 @@ export default function MenuFixer() {
     // ── 3. MOBILE BURGER MENU ────────────────────────────────────────────
     const burger = document.querySelector<HTMLElement>(".calypso-menu__burger");
     const mobileMenu = document.querySelector<HTMLElement>(
-      ".calypso-menu__mobile"
+      ".calypso-menu__mobile",
     );
     const nav = document.querySelector<HTMLElement>(".calypso-menu");
 
@@ -192,7 +212,7 @@ export default function MenuFixer() {
       .querySelectorAll<HTMLElement>(".calypso-menu__mobile-items > li")
       .forEach((li) => {
         const subMenu = li.querySelector<HTMLElement>(
-          ".calypso-menu__mobile-dropdown-menu"
+          ".calypso-menu__mobile-dropdown-menu",
         );
         const span = li.querySelector<HTMLElement>("span");
         if (subMenu && span) {
@@ -201,16 +221,16 @@ export default function MenuFixer() {
           subMenu.style.transition = "max-height 0.3s ease";
           span.style.cursor = "pointer";
           span.addEventListener("click", () => {
-            const open = li.classList.contains("calypso-menu__mobile-menu--active");
+            const open = li.classList.contains(
+              "calypso-menu__mobile-menu--active",
+            );
             // Close all
             document
-              .querySelectorAll<HTMLElement>(
-                ".calypso-menu__mobile-items > li"
-              )
+              .querySelectorAll<HTMLElement>(".calypso-menu__mobile-items > li")
               .forEach((other) => {
                 other.classList.remove("calypso-menu__mobile-menu--active");
                 const sm = other.querySelector<HTMLElement>(
-                  ".calypso-menu__mobile-dropdown-menu"
+                  ".calypso-menu__mobile-dropdown-menu",
                 );
                 if (sm) sm.style.maxHeight = "0";
               });

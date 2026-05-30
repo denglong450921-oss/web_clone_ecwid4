@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import MenuFixer from "./MenuFixer";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Ecwid 电子商务 — 在 5 分钟内免费添加在线商店",
@@ -18,7 +20,11 @@ export default function RootLayout({
       <head>
         {/* Preconnect for faster font loading */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossOrigin="anonymous"
+        />
 
         {/* Fonts */}
         <link
@@ -63,7 +69,9 @@ export default function RootLayout({
       </head>
       <body id="p-32564" className="index-EW19">
         <MenuFixer />
+        <Header />
         {children}
+        <Footer />
       </body>
     </html>
   );
