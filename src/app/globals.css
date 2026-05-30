@@ -14,6 +14,20 @@
   --mid: #515258;
   --light: #f7f7f8;
   --font: "Open Sans", system-ui, -apple-system, sans-serif;
+  --hero-col2-slide-distance: 34px;
+  --hero-col2-slide-scale: 0.96;
+  --hero-col2-slide-duration: 0.72s;
+  --hero-col2-slide-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --hero-col2-column-y-offset: -16px;
+  --hero-col1-y-offset: -35px;
+  --hero-col2-media-y-offset: -28px;
+  --hero-col2-bg-left: -90.3vw;
+  --hero-col2-bg-right: 84vw;
+  --hero-col2-bg-rotation: 30deg;
+  --hero-parallax-col1-opacity: 0.96;
+  --hero-phone-drift-offset: 0px;
+  --hero-tablet-scroll-offset: 0px;
+  --hero-tablet-scroll-duration: 1.8s;
 }
 
 /* ── Reset & base ── */
@@ -584,6 +598,11 @@ p {
   padding-top: 2.5rem !important;
 }
 
+/* Keep the homepage hero block itself flush like the original Ecwid layout. */
+.calypso-block--EW19-tile-1:first-child {
+  padding-top: 0 !important;
+}
+
 /* ── Sub-page hero top padding (prevent overlap with sticky nav) ── */
 
 /* Promote page hero */
@@ -677,6 +696,16 @@ section.calypso-block--background-menu {
    Keep the real Ecwid hero footprint instead of the narrow custom fallback.
    ═══════════════════════════════════════════════════════════════ */
 @media (min-width: 992px) {
+  .index-EW19 #hpc_col2,
+  .index-EW19 #hpc_col2 .hpc-pics--no-rotated,
+  .index-EW19 #hpc_col2 .hpc-pics__phone,
+  .index-EW19 #hpc_col2 .hpc-phone,
+  .index-EW19 #hpc_col2 .hpc-pics__tablet,
+  .index-EW19 #hpc_col2 .hpc-tablet,
+  .index-EW19 #hpc_col2 .hpc-pics__bg--second {
+    will-change: transform, rotate, opacity;
+  }
+
   .index-EW19 .container {
     width: 100% !important;
     max-width: none !important;
@@ -708,6 +737,7 @@ section.calypso-block--background-menu {
 
   .index-EW19 #hpc_col1 {
     padding: 0 24px 48px !important;
+    transform: translate3d(0, var(--hero-col1-y-offset), 0);
   }
 
   .index-EW19 #hpc_col1 .hpc-text {
@@ -718,18 +748,28 @@ section.calypso-block--background-menu {
     height: 663px !important;
     padding: 0 24px !important;
     overflow: visible !important;
+    transform: translate3d(0, var(--hero-col2-column-y-offset), 0);
   }
 
-  .index-EW19 #hpc_col2 .hpc-pics--rotated,
+  .index-EW19 #hpc_col2 .hpc-pics--rotated {
+    margin-top: -90px !important;
+    margin-left: -50px !important;
+  }
+
   .index-EW19 #hpc_col2 .hpc-pics--no-rotated {
     margin-top: 0 !important;
     margin-left: -50px !important;
   }
 
+  .index-EW19 #hpc_col2 .hpc-pics__phone,
+  .index-EW19 #hpc_col2 .hpc-pics__tablet {
+    transform: translate3d(0, var(--hero-col2-media-y-offset), 0);
+  }
+
   .index-EW19 #hpc_col2 .hpc-pics__bg--second {
-    right: 24vw !important;
-    left: auto !important;
-    transform: none !important;
+    left: var(--hero-col2-bg-left) !important;
+    right: var(--hero-col2-bg-right) !important;
+    transform: rotate(var(--hero-col2-bg-rotation)) !important;
   }
 }
 
@@ -743,4 +783,103 @@ section.calypso-block--background-menu {
 .index-EW19 #hpc_col2 .hpc-pics__phone.hpc-animate--animated,
 .index-EW19 #hpc_col2 .hpc-pics__tablet.hpc-animate--animated {
   opacity: 1 !important;
+}
+
+@keyframes hpcCol2SlideIn {
+  from {
+    opacity: 0;
+    transform: translate3d(var(--hero-col2-slide-distance), 0, 0)
+      scale(var(--hero-col2-slide-scale));
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+}
+
+@keyframes hpcCol2SlideOut {
+  from {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translate3d(calc(var(--hero-col2-slide-distance) * -1), 0, 0)
+      scale(var(--hero-col2-slide-scale));
+  }
+}
+
+@keyframes hpcCol2TabletScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  18% {
+    transform: translate3d(0, 0, 0);
+  }
+  72% {
+    transform: translate3d(
+      0,
+      calc(var(--hero-tablet-scroll-offset, 0px) * -1),
+      0
+    );
+  }
+  100% {
+    transform: translate3d(
+      0,
+      calc(var(--hero-tablet-scroll-offset, 0px) * -1),
+      0
+    );
+  }
+}
+
+@media (min-width: 992px) {
+  .index-EW19 #hpc_col2 .hpc-phone__slide,
+  .index-EW19 #hpc_col2 .hpc-tablet__slide {
+    will-change: opacity, transform;
+    transform-origin: center center;
+  }
+
+  .index-EW19 #hpc_col2 .hpc-phone__image {
+    will-change: transform;
+    transform: translate3d(
+      0,
+      calc(var(--hero-phone-drift-offset, 0px) * -1),
+      0
+    );
+    transition: transform 0.38s ease-out;
+  }
+
+  .index-EW19 #hpc_col2 .hpc-tablet__image {
+    will-change: transform;
+    transform-origin: top center;
+  }
+
+  .index-EW19 #hpc_col2 .hpc-col2-slide-in {
+    animation: hpcCol2SlideIn var(--hero-col2-slide-duration)
+      var(--hero-col2-slide-ease) both;
+  }
+
+  .index-EW19 #hpc_col2 .hpc-col2-slide-out {
+    animation: hpcCol2SlideOut var(--hero-col2-slide-duration)
+      var(--hero-col2-slide-ease) both;
+  }
+
+  .index-EW19 #hpc_col2 .hpc-col2-tablet-image--scrolling {
+    animation: hpcCol2TabletScroll var(--hero-tablet-scroll-duration)
+      ease-in-out both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) and (min-width: 992px) {
+  .index-EW19 #hpc_col1,
+  .index-EW19 #hpc_col2,
+  .index-EW19 #hpc_col2 .hpc-pics--no-rotated,
+  .index-EW19 #hpc_col2 .hpc-pics__phone,
+  .index-EW19 #hpc_col2 .hpc-phone,
+  .index-EW19 #hpc_col2 .hpc-pics__tablet,
+  .index-EW19 #hpc_col2 .hpc-tablet,
+  .index-EW19 #hpc_col2 .hpc-pics__bg--second {
+    transition: none !important;
+    animation: none !important;
+  }
 }
