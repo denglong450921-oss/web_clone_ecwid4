@@ -7,7 +7,11 @@ const HERO_ROTATE_INTERVAL_MS = 2600;
 const HERO_SLIDE_PREPARE_DELAY_MS = 850;
 const HERO_PHONE_INTRO_DELAY_MS = 120;
 const HERO_TABLET_INTRO_DELAY_MS = 260;
-const HERO_BG_RIGHT_DESKTOP = "24vw";
+const HERO_FRAME_TRANSITION_RESET_MS = 760;
+const HERO_TABLET_SCROLL_RESET_MS = 1800;
+const HERO_TABLET_SCROLL_RANGE_PX = 118;
+const HERO_LOCKED_STATE_INDEX = 0;
+const HERO_LOCK_STATE_FOR_COMPARISON = false;
 const HERO_NAV_SHADOW_DEFAULT = "0 2px 16px rgba(0,0,0,0.06)";
 const HERO_NAV_SHADOW_SCROLLED = "0 4px 24px rgba(0,0,0,0.12)";
 
@@ -17,6 +21,11 @@ type HomeHeroState = {
   accentColor: string;
   phoneSrc: string;
   tabletSrc: string;
+};
+
+type HomeHeroAnimationController = {
+  cleanup: () => void;
+  syncScrollMotion: () => void;
 };
 
 const HOME_HERO_STATES: HomeHeroState[] = [
@@ -39,7 +48,8 @@ const HOME_HERO_STATES: HomeHeroState[] = [
     underlineClass: "hpc-underlined--magenta",
     accentColor: "#ea4c89",
     phoneSrc: "/images/Instagram_mob.png",
-    tabletSrc: "/images/Website_pad.png",
+    tabletSrc:
+      "https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/png_illustrations/Instagram_pad.png",
   },
   {
     label: "Facebook 上销售",
@@ -87,7 +97,10 @@ function setHeroImageSource(
  * Rotates the homepage hero copy and phone/tablet slides so the local clone
  * feels like the original Ecwid landing page instead of a static snapshot.
  */
-function setupHomeHeroAnimation(): () => void {
+function setupHomeHeroAnimation(): HomeHeroAnimationController {
+  const heroSection = document.querySelector<HTMLElement>(
+    ".calypso-block--EW19-tile-1",
+  );
   const salesChannel =
     document.querySelector<HTMLElement>("#hpc_sales_channel");
   const underline = document.querySelector<HTMLElement>("#hpc_underlined");
@@ -110,20 +123,21 @@ function setupHomeHeroAnimation(): () => void {
     "#hpc_col2 .hpc-mobile-pics__image--tablet",
   );
 
-  let phoneCurrentSlide = document.querySelector<HTMLElement>(
+  const phoneCurrentSlide = document.querySelector<HTMLElement>(
     "#hpc_col2 .hpc-phone__slide--current",
   );
-  let phoneNextSlide = document.querySelector<HTMLElement>(
+  const phoneNextSlide = document.querySelector<HTMLElement>(
     "#hpc_col2 .hpc-phone__slide--next",
   );
-  let tabletCurrentSlide = document.querySelector<HTMLElement>(
+  const tabletCurrentSlide = document.querySelector<HTMLElement>(
     "#hpc_col2 .hpc-tablet__slide--current",
   );
-  let tabletNextSlide = document.querySelector<HTMLElement>(
+  const tabletNextSlide = document.querySelector<HTMLElement>(
     "#hpc_col2 .hpc-tablet__slide--next",
   );
 
   if (
+    !heroSection ||
     !salesChannel ||
     !underline ||
     !accentBackground ||
@@ -135,11 +149,14 @@ function setupHomeHeroAnimation(): () => void {
     !tabletCurrentSlide ||
     !tabletNextSlide
   ) {
-    return () => undefined;
+    return {
+      cleanup: () => undefined,
+      syncScrollMotion: () => undefined,
+    };
   }
 
   const pendingTimers: number[] = [];
-  let activeIndex = 0;
+  let activeIndex = HERO_LOCK_STATE_FOR_COMPARISON ? HERO_LOCKED_STATE_INDEX : 0;
   let activePhoneCurrentSlide: HTMLElement = phoneCurrentSlide;
   let activePhoneNextSlide: HTMLElement = phoneNextSlide;
   let activeTabletCurrentSlide: HTMLElement = tabletCurrentSlide;
@@ -159,6 +176,87 @@ function setupHomeHeroAnimation(): () => void {
     activeTabletNextSlide.querySelector<HTMLImageElement>(".hpc-tablet__image");
 
   /**
+   * Restarts a CSS keyframe class on demand so repeated hero rotations keep
+   * feeling animated instead of snapping to the next asset.
+   */
+  const replayAnimationClass = (
+    element: HTMLElement | null,
+    className: string,
+  ) => {
+    if (!element) {
+      return;
+    }
+
+    element.classList.remove(className);
+    void element.offsetWidth;
+    element.classList.add(className);
+
+    pendingTimers.push(
+      window.setTimeout(() => {
+        element.classList.remove(className);
+      }, HERO_FRAME_TRANSITION_RESET_MS),
+    );
+  };
+
+  /**
+   * Replays the tablet's inner webpage scroll so the screenshot inside the frame
+   * behaves like a page being browsed rather than a static poster.
+   */
+  const animateTabletViewport = (slide: HTMLElement) => {
+    const image = slide.querySelector<HTMLElement>(".hpc-tablet__image");
+    if (!image) {
+      return;
+    }
+
+    image.style.setProperty("--hero-tablet-scroll-offset", "0px");
+    image.classList.remove("hpc-col2-tablet-image--scrolling");
+    void image.offsetWidth;
+    image.classList.add("hpc-col2-tablet-image--scrolling");
+
+    pendingTimers.push(
+      window.setTimeout(() => {
+        image.classList.remove("hpc-col2-tablet-image--scrolling");
+      }, HERO_TABLET_SCROLL_RESET_MS),
+    );
+  };
+
+  /**
+   * Couples the hero media with page scroll so the tablet content keeps moving
+   * while the hero is in view, matching the original interactive feeling.
+   */
+  const syncHeroScrollMotion = () => {
+    const currentTabletImage =
+      activeTabletCurrentSlide.querySelector<HTMLElement>(".hpc-tablet__image");
+    const currentPhoneImage =
+      activePhoneCurrentSlide.querySelector<HTMLElement>(".hpc-phone__image");
+    if (!currentTabletImage || !currentPhoneImage) {
+      return;
+    }
+
+    const heroRect = heroSection.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+    const progress = Math.min(
+      1,
+      Math.max(
+        0,
+        (viewportHeight - heroRect.top) /
+          (heroRect.height + viewportHeight * 0.2),
+      ),
+    );
+    const tabletOffset = Math.round(progress * HERO_TABLET_SCROLL_RANGE_PX);
+    const phoneOffset = Math.round(progress * 48);
+
+    currentTabletImage.style.setProperty(
+      "--hero-tablet-scroll-offset",
+      `${tabletOffset}px`,
+    );
+    currentPhoneImage.style.setProperty(
+      "--hero-phone-drift-offset",
+      `${phoneOffset}px`,
+    );
+  };
+
+  /**
    * Applies the text, underline, accent background and responsive fallback art
    * for one hero rotation state.
    */
@@ -167,9 +265,7 @@ function setupHomeHeroAnimation(): () => void {
     salesChannel.textContent = state.label;
     underline.className = `hpc-underlined ${state.underlineClass}`;
     accentBackground.style.backgroundColor = state.accentColor;
-    accentBackground.style.right = HERO_BG_RIGHT_DESKTOP;
-    accentBackground.style.left = "auto";
-    rotatedStack.style.marginTop = "0";
+    rotatedStack.style.marginTop = "-90px";
 
     setHeroImageSource(mobilePhoneImage, state.phoneSrc);
     setHeroImageSource(mobileTabletImage, state.tabletSrc);
@@ -230,6 +326,8 @@ function setupHomeHeroAnimation(): () => void {
 
     revealHeroLayer(phoneShell, HERO_PHONE_INTRO_DELAY_MS);
     revealHeroLayer(tabletShell, HERO_TABLET_INTRO_DELAY_MS);
+    animateTabletViewport(activeTabletCurrentSlide);
+    syncHeroScrollMotion();
   };
 
   const rotateHero = () => {
@@ -237,6 +335,11 @@ function setupHomeHeroAnimation(): () => void {
     const followingIndex = (nextIndex + 1) % HOME_HERO_STATES.length;
 
     applyHeroState(nextIndex);
+
+    replayAnimationClass(activePhoneCurrentSlide, "hpc-col2-slide-out");
+    replayAnimationClass(activePhoneNextSlide, "hpc-col2-slide-in");
+    replayAnimationClass(activeTabletCurrentSlide, "hpc-col2-slide-out");
+    replayAnimationClass(activeTabletNextSlide, "hpc-col2-slide-in");
 
     [activePhoneCurrentSlide, activePhoneNextSlide] = advanceSlidePair(
       activePhoneCurrentSlide,
@@ -264,15 +367,30 @@ function setupHomeHeroAnimation(): () => void {
       "hpc-tablet__slide",
     );
 
+    animateTabletViewport(activeTabletCurrentSlide);
+    syncHeroScrollMotion();
     activeIndex = nextIndex;
   };
 
   primeHero();
+
+  if (HERO_LOCK_STATE_FOR_COMPARISON) {
+    return {
+      cleanup: () => {
+        pendingTimers.forEach((timer) => window.clearTimeout(timer));
+      },
+      syncScrollMotion: syncHeroScrollMotion,
+    };
+  }
+
   const rotationTimer = window.setInterval(rotateHero, HERO_ROTATE_INTERVAL_MS);
 
-  return () => {
-    window.clearInterval(rotationTimer);
-    pendingTimers.forEach((timer) => window.clearTimeout(timer));
+  return {
+    cleanup: () => {
+      window.clearInterval(rotationTimer);
+      pendingTimers.forEach((timer) => window.clearTimeout(timer));
+    },
+    syncScrollMotion: syncHeroScrollMotion,
   };
 }
 
@@ -306,7 +424,7 @@ export default function MenuFixer() {
         animObserver.observe(el);
       });
 
-    const cleanupHomeHeroAnimation = setupHomeHeroAnimation();
+    const homeHeroAnimation = setupHomeHeroAnimation();
 
     // ── 2. DESKTOP DROPDOWN HOVER ────────────────────────────────────────
     const dropdowns = document.querySelectorAll<HTMLElement>(
@@ -479,8 +597,11 @@ export default function MenuFixer() {
       } else {
         navEl.style.boxShadow = HERO_NAV_SHADOW_DEFAULT;
       }
+
+      homeHeroAnimation.syncScrollMotion();
     };
     window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
 
     // ── 5. MOBILE MENU ACCORDION ─────────────────────────────────────────
     document
@@ -518,7 +639,7 @@ export default function MenuFixer() {
       });
 
     return () => {
-      cleanupHomeHeroAnimation();
+      homeHeroAnimation.cleanup();
       animObserver.disconnect();
       document.removeEventListener("click", closeAll);
       window.removeEventListener("scroll", onScroll);
