@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { usePathname, useRouter } from "next/navigation";
 
 const HERO_ROTATE_INTERVAL_MS = 2600;
@@ -10,6 +12,17 @@ const HERO_TABLET_INTRO_DELAY_MS = 260;
 const HERO_FRAME_TRANSITION_RESET_MS = 760;
 const HERO_TABLET_SCROLL_RESET_MS = 1800;
 const HERO_TABLET_SCROLL_RANGE_PX = 118;
+const HERO_PARALLAX_BREAKPOINT_PX = 992;
+const HERO_PARALLAX_SCRUB = 0.8;
+const HERO_PARALLAX_START = "top top";
+const HERO_PARALLAX_END_DISTANCE_PX = 420;
+const HERO_PARALLAX_MAIN_X_PX = 180;
+const HERO_PARALLAX_MAIN_ROTATION_DEG = 0;
+const HERO_PARALLAX_MAIN_SCALE = 0.96;
+const HERO_PARALLAX_PHONE_INNER_X_PX = 112;
+const HERO_PARALLAX_TABLET_INNER_X_PX = 72;
+const HERO_PARALLAX_BG_STAGE_X_PX = 96;
+const HERO_PARALLAX_COL1_OPACITY = 0.96;
 const HERO_LOCKED_STATE_INDEX = 0;
 const HERO_LOCK_STATE_FOR_COMPARISON = false;
 const HERO_NAV_SHADOW_DEFAULT = "0 2px 16px rgba(0,0,0,0.06)";
@@ -26,7 +39,39 @@ type HomeHeroState = {
 type HomeHeroAnimationController = {
   cleanup: () => void;
   syncScrollMotion: () => void;
+  hasGsapParallax: boolean;
 };
+
+let isScrollTriggerRegistered = false;
+
+/**
+ * Registers GSAP plugins once so repeated homepage visits do not duplicate
+ * plugin setup work or create noisy runtime warnings.
+ */
+function ensureGsapPlugins(): void {
+  if (isScrollTriggerRegistered) {
+    return;
+  }
+
+  gsap.registerPlugin(ScrollTrigger);
+  isScrollTriggerRegistered = true;
+}
+
+/**
+ * Limits the GSAP parallax experience to the desktop layout where the hero
+ * has enough room to pin and animate horizontally.
+ */
+function isDesktopViewport(): boolean {
+  return window.innerWidth >= HERO_PARALLAX_BREAKPOINT_PX;
+}
+
+/**
+ * Honors reduced-motion preferences by skipping scroll-driven transforms when
+ * the user has explicitly asked for calmer motion.
+ */
+function prefersReducedMotion(): boolean {
+  return window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+}
 
 const HOME_HERO_STATES: HomeHeroState[] = [
   {
@@ -110,11 +155,25 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
   const rotatedStack = document.querySelector<HTMLElement>(
     "#hpc_col2 .hpc-pics--rotated",
   );
+  const col1 = document.querySelector<HTMLElement>("#hpc_col1");
+  const col2 = document.querySelector<HTMLElement>("#hpc_col2");
+  const backgroundPlane = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-pics__bg--second",
+  );
+  const backgroundStage = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-pics--no-rotated",
+  );
   const phoneShell = document.querySelector<HTMLElement>(
     "#hpc_col2 .hpc-pics__phone",
   );
+  const phoneInnerFrame = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-phone",
+  );
   const tabletShell = document.querySelector<HTMLElement>(
     "#hpc_col2 .hpc-pics__tablet",
+  );
+  const tabletInnerFrame = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-tablet",
   );
   const mobilePhoneImage = document.querySelector<HTMLImageElement>(
     "#hpc_col2 .hpc-mobile-pics__image--mobile",
@@ -142,8 +201,14 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
     !underline ||
     !accentBackground ||
     !rotatedStack ||
+    !col1 ||
+    !col2 ||
+    !backgroundPlane ||
+    !backgroundStage ||
     !phoneShell ||
+    !phoneInnerFrame ||
     !tabletShell ||
+    !tabletInnerFrame ||
     !phoneCurrentSlide ||
     !phoneNextSlide ||
     !tabletCurrentSlide ||
@@ -152,11 +217,14 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
     return {
       cleanup: () => undefined,
       syncScrollMotion: () => undefined,
+      hasGsapParallax: false,
     };
   }
 
   const pendingTimers: number[] = [];
-  let activeIndex = HERO_LOCK_STATE_FOR_COMPARISON ? HERO_LOCKED_STATE_INDEX : 0;
+  let activeIndex = HERO_LOCK_STATE_FOR_COMPARISON
+    ? HERO_LOCKED_STATE_INDEX
+    : 0;
   let activePhoneCurrentSlide: HTMLElement = phoneCurrentSlide;
   let activePhoneNextSlide: HTMLElement = phoneNextSlide;
   let activeTabletCurrentSlide: HTMLElement = tabletCurrentSlide;
@@ -330,6 +398,81 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
     syncHeroScrollMotion();
   };
 
+  /**
+   * Builds a desktop-only ScrollTrigger timeline that pins the hero briefly and
+   * shifts hpc_col2 into a more horizontal composition while keeping col1 calm.
+   * Inner media frames move independently so the parallax still reads after the
+   * outer wrappers keep their original entrance/offset transforms.
+   */
+  const setupGsapParallax = (): (() => void) | null => {
+    if (
+      HERO_LOCK_STATE_FOR_COMPARISON ||
+      !isDesktopViewport() ||
+      prefersReducedMotion()
+    ) {
+      return null;
+    }
+
+    ensureGsapPlugins();
+
+    const context = gsap.context(() => {
+      const timeline = gsap.timeline({
+        defaults: { ease: "none" },
+        scrollTrigger: {
+          trigger: heroSection,
+          start: HERO_PARALLAX_START,
+          end: `+=${HERO_PARALLAX_END_DISTANCE_PX}`,
+          pin: true,
+          scrub: HERO_PARALLAX_SCRUB,
+          invalidateOnRefresh: true,
+        },
+      });
+
+      timeline
+        .to(
+          col2,
+          {
+            x: HERO_PARALLAX_MAIN_X_PX,
+            rotate: HERO_PARALLAX_MAIN_ROTATION_DEG,
+            scale: HERO_PARALLAX_MAIN_SCALE,
+          },
+          0,
+        )
+        .to(
+          phoneInnerFrame,
+          {
+            x: HERO_PARALLAX_PHONE_INNER_X_PX,
+          },
+          0,
+        )
+        .to(
+          tabletInnerFrame,
+          {
+            x: HERO_PARALLAX_TABLET_INNER_X_PX,
+          },
+          0,
+        )
+        .to(
+          backgroundStage,
+          {
+            x: HERO_PARALLAX_BG_STAGE_X_PX,
+          },
+          0,
+        )
+        .to(
+          col1,
+          {
+            opacity: HERO_PARALLAX_COL1_OPACITY,
+          },
+          0,
+        );
+    }, heroSection);
+
+    return () => {
+      context.revert();
+    };
+  };
+
   const rotateHero = () => {
     const nextIndex = (activeIndex + 1) % HOME_HERO_STATES.length;
     const followingIndex = (nextIndex + 1) % HOME_HERO_STATES.length;
@@ -373,13 +516,16 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
   };
 
   primeHero();
+  const cleanupGsapParallax = setupGsapParallax();
 
   if (HERO_LOCK_STATE_FOR_COMPARISON) {
     return {
       cleanup: () => {
+        cleanupGsapParallax?.();
         pendingTimers.forEach((timer) => window.clearTimeout(timer));
       },
       syncScrollMotion: syncHeroScrollMotion,
+      hasGsapParallax: Boolean(cleanupGsapParallax),
     };
   }
 
@@ -388,9 +534,11 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
   return {
     cleanup: () => {
       window.clearInterval(rotationTimer);
+      cleanupGsapParallax?.();
       pendingTimers.forEach((timer) => window.clearTimeout(timer));
     },
     syncScrollMotion: syncHeroScrollMotion,
+    hasGsapParallax: Boolean(cleanupGsapParallax),
   };
 }
 
@@ -645,7 +793,7 @@ export default function MenuFixer() {
       window.removeEventListener("scroll", onScroll);
       if (menuEl) menuEl.removeEventListener("click", handleLinkClick);
     };
-  }, [pathname]);
+  }, [pathname, router]);
 
   return null;
 }
