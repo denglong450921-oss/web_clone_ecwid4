@@ -671,3 +671,76 @@ section.calypso-block--background-menu {
 .calypso-menu__dropdown-menu-item a:hover {
   background: #f7f7f8 !important;
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   HOMEPAGE HERO FIDELITY RESTORE
+   Keep the real Ecwid hero footprint instead of the narrow custom fallback.
+   ═══════════════════════════════════════════════════════════════ */
+@media (min-width: 992px) {
+  .index-EW19 .container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding-left: 72px !important;
+    padding-right: 72px !important;
+  }
+
+  .index-EW19 .calypso-block--EW19-tile-1 {
+    margin: 102px 0 0 !important;
+    padding: 0 !important;
+  }
+
+  .index-EW19
+    .page.calypso-page
+    > .calypso-viewport:first-child
+    > section
+    > .container,
+  .index-EW19 .page.calypso-page > section:first-child > .container,
+  .index-EW19 .calypso-viewport#tile-1 {
+    padding-top: 0 !important;
+  }
+
+  .index-EW19 .calypso-promo.calypso-promo--first-lg-b48 {
+    min-height: 663px !important;
+    padding: 0 !important;
+    align-items: normal !important;
+  }
+
+  .index-EW19 #hpc_col1 {
+    padding: 0 24px 48px !important;
+  }
+
+  .index-EW19 #hpc_col1 .hpc-text {
+    padding-top: 38px !important;
+  }
+
+  .index-EW19 #hpc_col2 {
+    height: 663px !important;
+    padding: 0 24px !important;
+    overflow: visible !important;
+  }
+
+  .index-EW19 #hpc_col2 .hpc-pics--rotated,
+  .index-EW19 #hpc_col2 .hpc-pics--no-rotated {
+    margin-top: 0 !important;
+    margin-left: -50px !important;
+  }
+
+  .index-EW19 #hpc_col2 .hpc-pics__bg--second {
+    right: 24vw !important;
+    left: auto !important;
+    transform: none !important;
+  }
+}
+
+.index-EW19 #hpc_col1 .hpc-animate,
+.index-EW19 #hpc_col2 .hpc-pics__phone,
+.index-EW19 #hpc_col2 .hpc-pics__tablet {
+  opacity: 0;
+}
+
+.index-EW19 #hpc_col1 .hpc-animate.hpc-animate--animated,
+.index-EW19 #hpc_col2 .hpc-pics__phone.hpc-animate--animated,
+.index-EW19 #hpc_col2 .hpc-pics__tablet.hpc-animate--animated {
+  opacity: 1 !important;
+}

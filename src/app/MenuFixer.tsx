@@ -3,6 +3,279 @@
 import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 
+const HERO_ROTATE_INTERVAL_MS = 2600;
+const HERO_SLIDE_PREPARE_DELAY_MS = 850;
+const HERO_PHONE_INTRO_DELAY_MS = 120;
+const HERO_TABLET_INTRO_DELAY_MS = 260;
+const HERO_BG_RIGHT_DESKTOP = "24vw";
+const HERO_NAV_SHADOW_DEFAULT = "0 2px 16px rgba(0,0,0,0.06)";
+const HERO_NAV_SHADOW_SCROLLED = "0 4px 24px rgba(0,0,0,0.12)";
+
+type HomeHeroState = {
+  label: string;
+  underlineClass: string;
+  accentColor: string;
+  phoneSrc: string;
+  tabletSrc: string;
+};
+
+const HOME_HERO_STATES: HomeHeroState[] = [
+  {
+    label: "免费在线",
+    underlineClass: "hpc-underlined--yellow",
+    accentColor: "#fae053",
+    phoneSrc: "/images/Website_mob.png",
+    tabletSrc: "/images/Website_pad.png",
+  },
+  {
+    label: "站上销售",
+    underlineClass: "hpc-underlined--green",
+    accentColor: "#8fd18a",
+    phoneSrc: "/images/Website_mob.png",
+    tabletSrc: "/images/Website_pad.png",
+  },
+  {
+    label: "Instagram 上销售",
+    underlineClass: "hpc-underlined--magenta",
+    accentColor: "#ea4c89",
+    phoneSrc: "/images/Instagram_mob.png",
+    tabletSrc: "/images/Website_pad.png",
+  },
+  {
+    label: "Facebook 上销售",
+    underlineClass: "hpc-underlined--indigo",
+    accentColor: "#3b5998",
+    phoneSrc: "/images/Facebook_mob.png",
+    tabletSrc: "/images/Facebook_pad.png",
+  },
+  {
+    label: "Amazon 上销售",
+    underlineClass: "hpc-underlined--sandy",
+    accentColor: "#f59d3d",
+    phoneSrc: "/images/Amazon_mob.png",
+    tabletSrc: "/images/Amazon_pad.png",
+  },
+  {
+    label: "Google 上销售",
+    underlineClass: "hpc-underlined--azure",
+    accentColor: "#4285f4",
+    phoneSrc: "/images/Google_mob.png",
+    tabletSrc: "/images/Google_pad.png",
+  },
+];
+
+/**
+ * Ensures hero slide images always point to the correct asset.
+ * Keeping this centralized avoids stale empty `src` attributes.
+ */
+function setHeroImageSource(
+  imageElement: HTMLImageElement | null,
+  source: string,
+): void {
+  if (!imageElement) {
+    return;
+  }
+
+  if (imageElement.getAttribute("src") !== source) {
+    imageElement.setAttribute("src", source);
+  }
+
+  imageElement.removeAttribute("srcset");
+}
+
+/**
+ * Rotates the homepage hero copy and phone/tablet slides so the local clone
+ * feels like the original Ecwid landing page instead of a static snapshot.
+ */
+function setupHomeHeroAnimation(): () => void {
+  const salesChannel =
+    document.querySelector<HTMLElement>("#hpc_sales_channel");
+  const underline = document.querySelector<HTMLElement>("#hpc_underlined");
+  const accentBackground = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-pics__bg--second",
+  );
+  const rotatedStack = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-pics--rotated",
+  );
+  const phoneShell = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-pics__phone",
+  );
+  const tabletShell = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-pics__tablet",
+  );
+  const mobilePhoneImage = document.querySelector<HTMLImageElement>(
+    "#hpc_col2 .hpc-mobile-pics__image--mobile",
+  );
+  const mobileTabletImage = document.querySelector<HTMLImageElement>(
+    "#hpc_col2 .hpc-mobile-pics__image--tablet",
+  );
+
+  let phoneCurrentSlide = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-phone__slide--current",
+  );
+  let phoneNextSlide = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-phone__slide--next",
+  );
+  let tabletCurrentSlide = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-tablet__slide--current",
+  );
+  let tabletNextSlide = document.querySelector<HTMLElement>(
+    "#hpc_col2 .hpc-tablet__slide--next",
+  );
+
+  if (
+    !salesChannel ||
+    !underline ||
+    !accentBackground ||
+    !rotatedStack ||
+    !phoneShell ||
+    !tabletShell ||
+    !phoneCurrentSlide ||
+    !phoneNextSlide ||
+    !tabletCurrentSlide ||
+    !tabletNextSlide
+  ) {
+    return () => undefined;
+  }
+
+  const pendingTimers: number[] = [];
+  let activeIndex = 0;
+  let activePhoneCurrentSlide: HTMLElement = phoneCurrentSlide;
+  let activePhoneNextSlide: HTMLElement = phoneNextSlide;
+  let activeTabletCurrentSlide: HTMLElement = tabletCurrentSlide;
+  let activeTabletNextSlide: HTMLElement = tabletNextSlide;
+
+  const phoneCurrentImage =
+    activePhoneCurrentSlide.querySelector<HTMLImageElement>(
+      ".hpc-phone__image",
+    );
+  const phoneNextImage =
+    activePhoneNextSlide.querySelector<HTMLImageElement>(".hpc-phone__image");
+  const tabletCurrentImage =
+    activeTabletCurrentSlide.querySelector<HTMLImageElement>(
+      ".hpc-tablet__image",
+    );
+  const tabletNextImage =
+    activeTabletNextSlide.querySelector<HTMLImageElement>(".hpc-tablet__image");
+
+  /**
+   * Applies the text, underline, accent background and responsive fallback art
+   * for one hero rotation state.
+   */
+  const applyHeroState = (stateIndex: number) => {
+    const state = HOME_HERO_STATES[stateIndex];
+    salesChannel.textContent = state.label;
+    underline.className = `hpc-underlined ${state.underlineClass}`;
+    accentBackground.style.backgroundColor = state.accentColor;
+    accentBackground.style.right = HERO_BG_RIGHT_DESKTOP;
+    accentBackground.style.left = "auto";
+    rotatedStack.style.marginTop = "0";
+
+    setHeroImageSource(mobilePhoneImage, state.phoneSrc);
+    setHeroImageSource(mobileTabletImage, state.tabletSrc);
+  };
+
+  /**
+   * Swaps the current/next slide classes so the existing CSS transitions animate,
+   * then preloads the following asset into the slide that moved off canvas.
+   */
+  const advanceSlidePair = (
+    currentSlide: HTMLElement,
+    nextSlide: HTMLElement,
+    currentImage: HTMLImageElement | null,
+    nextImage: HTMLImageElement | null,
+    incomingSrc: string,
+    followingSrc: string,
+    baseClass: string,
+  ): [HTMLElement, HTMLElement] => {
+    setHeroImageSource(nextImage, incomingSrc);
+    currentSlide.classList.remove(`${baseClass}--current`);
+    currentSlide.classList.add(`${baseClass}--next`);
+    nextSlide.classList.remove(`${baseClass}--next`);
+    nextSlide.classList.add(`${baseClass}--current`);
+
+    pendingTimers.push(
+      window.setTimeout(() => {
+        setHeroImageSource(currentImage, followingSrc);
+      }, HERO_SLIDE_PREPARE_DELAY_MS),
+    );
+
+    return [nextSlide, currentSlide];
+  };
+
+  /**
+   * Forces the visible hero layers to play their entrance animation immediately
+   * on the homepage, matching the original first-paint behavior.
+   */
+  const revealHeroLayer = (element: HTMLElement, delayMs: number) => {
+    pendingTimers.push(
+      window.setTimeout(() => {
+        element.classList.add("hpc-animate--animated", "animate--animated");
+        element.style.opacity = "1";
+        element.style.transform = "none";
+      }, delayMs),
+    );
+  };
+
+  const primeHero = () => {
+    const nextIndex = (activeIndex + 1) % HOME_HERO_STATES.length;
+    const initialState = HOME_HERO_STATES[activeIndex];
+    const queuedState = HOME_HERO_STATES[nextIndex];
+
+    applyHeroState(activeIndex);
+    setHeroImageSource(phoneCurrentImage, initialState.phoneSrc);
+    setHeroImageSource(phoneNextImage, queuedState.phoneSrc);
+    setHeroImageSource(tabletCurrentImage, initialState.tabletSrc);
+    setHeroImageSource(tabletNextImage, queuedState.tabletSrc);
+
+    revealHeroLayer(phoneShell, HERO_PHONE_INTRO_DELAY_MS);
+    revealHeroLayer(tabletShell, HERO_TABLET_INTRO_DELAY_MS);
+  };
+
+  const rotateHero = () => {
+    const nextIndex = (activeIndex + 1) % HOME_HERO_STATES.length;
+    const followingIndex = (nextIndex + 1) % HOME_HERO_STATES.length;
+
+    applyHeroState(nextIndex);
+
+    [activePhoneCurrentSlide, activePhoneNextSlide] = advanceSlidePair(
+      activePhoneCurrentSlide,
+      activePhoneNextSlide,
+      activePhoneCurrentSlide.querySelector<HTMLImageElement>(
+        ".hpc-phone__image",
+      ),
+      activePhoneNextSlide.querySelector<HTMLImageElement>(".hpc-phone__image"),
+      HOME_HERO_STATES[nextIndex].phoneSrc,
+      HOME_HERO_STATES[followingIndex].phoneSrc,
+      "hpc-phone__slide",
+    );
+
+    [activeTabletCurrentSlide, activeTabletNextSlide] = advanceSlidePair(
+      activeTabletCurrentSlide,
+      activeTabletNextSlide,
+      activeTabletCurrentSlide.querySelector<HTMLImageElement>(
+        ".hpc-tablet__image",
+      ),
+      activeTabletNextSlide.querySelector<HTMLImageElement>(
+        ".hpc-tablet__image",
+      ),
+      HOME_HERO_STATES[nextIndex].tabletSrc,
+      HOME_HERO_STATES[followingIndex].tabletSrc,
+      "hpc-tablet__slide",
+    );
+
+    activeIndex = nextIndex;
+  };
+
+  primeHero();
+  const rotationTimer = window.setInterval(rotateHero, HERO_ROTATE_INTERVAL_MS);
+
+  return () => {
+    window.clearInterval(rotationTimer);
+    pendingTimers.forEach((timer) => window.clearTimeout(timer));
+  };
+}
+
 export default function MenuFixer() {
   const pathname = usePathname();
   const router = useRouter();
@@ -32,6 +305,8 @@ export default function MenuFixer() {
         (el as HTMLElement).style.opacity = "0";
         animObserver.observe(el);
       });
+
+    const cleanupHomeHeroAnimation = setupHomeHeroAnimation();
 
     // ── 2. DESKTOP DROPDOWN HOVER ────────────────────────────────────────
     const dropdowns = document.querySelectorAll<HTMLElement>(
@@ -200,9 +475,9 @@ export default function MenuFixer() {
       const navEl = document.querySelector<HTMLElement>(".calypso-menu");
       if (!navEl) return;
       if (window.scrollY > 20) {
-        navEl.style.boxShadow = "0 4px 24px rgba(0,0,0,0.12)";
+        navEl.style.boxShadow = HERO_NAV_SHADOW_SCROLLED;
       } else {
-        navEl.style.boxShadow = "0 2px 16px rgba(0,0,0,0.06)";
+        navEl.style.boxShadow = HERO_NAV_SHADOW_DEFAULT;
       }
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -243,6 +518,7 @@ export default function MenuFixer() {
       });
 
     return () => {
+      cleanupHomeHeroAnimation();
       animObserver.disconnect();
       document.removeEventListener("click", closeAll);
       window.removeEventListener("scroll", onScroll);
