@@ -435,6 +435,7 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
             x: HERO_PARALLAX_MAIN_X_PX,
             rotate: HERO_PARALLAX_MAIN_ROTATION_DEG,
             scale: HERO_PARALLAX_MAIN_SCALE,
+            transformOrigin: "center center",
           },
           0,
         )
