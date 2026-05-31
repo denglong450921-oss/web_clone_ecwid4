@@ -49,12 +49,16 @@ let isScrollTriggerRegistered = false;
  * plugin setup work or create noisy runtime warnings.
  */
 function ensureGsapPlugins(): void {
-  if (isScrollTriggerRegistered) {
-    return;
+  if (!isScrollTriggerRegistered) {
+    gsap.registerPlugin(ScrollTrigger);
+    isScrollTriggerRegistered = true;
+    if (typeof window !== "undefined") {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).gsap = gsap;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      (window as any).ScrollTrigger = ScrollTrigger;
+    }
   }
-
-  gsap.registerPlugin(ScrollTrigger);
-  isScrollTriggerRegistered = true;
 }
 
 /**
@@ -376,7 +380,6 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
       window.setTimeout(() => {
         element.classList.add("hpc-animate--animated", "animate--animated");
         element.style.opacity = "1";
-        element.style.transform = "none";
       }, delayMs),
     );
   };
@@ -420,9 +423,10 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
         defaults: { ease: "none" },
         scrollTrigger: {
           trigger: heroSection,
-          start: HERO_PARALLAX_START,
-          end: `+=${HERO_PARALLAX_END_DISTANCE_PX}`,
+          start: "top 81px",
+          end: "+=500", // Restore to previous pin distance
           pin: true,
+          anticipatePin: 1,
           scrub: HERO_PARALLAX_SCRUB,
           invalidateOnRefresh: true,
         },
@@ -432,38 +436,25 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
         .to(
           col2,
           {
-            x: HERO_PARALLAX_MAIN_X_PX,
-            rotate: HERO_PARALLAX_MAIN_ROTATION_DEG,
-            scale: HERO_PARALLAX_MAIN_SCALE,
-            transformOrigin: "center center",
+            rotate: 0,
+            x: 100, // Restore horizontal shift
+            force3D: true,
           },
           0,
         )
         .to(
-          phoneInnerFrame,
+          phoneShell,
           {
-            x: HERO_PARALLAX_PHONE_INNER_X_PX,
+            x: 60, // Restore inner parallax
+            force3D: true,
           },
           0,
         )
         .to(
-          tabletInnerFrame,
+          tabletShell,
           {
-            x: HERO_PARALLAX_TABLET_INNER_X_PX,
-          },
-          0,
-        )
-        .to(
-          backgroundStage,
-          {
-            x: HERO_PARALLAX_BG_STAGE_X_PX,
-          },
-          0,
-        )
-        .to(
-          col1,
-          {
-            opacity: HERO_PARALLAX_COL1_OPACITY,
+            x: 40,
+            force3D: true,
           },
           0,
         );
@@ -534,6 +525,7 @@ function setupHomeHeroAnimation(): HomeHeroAnimationController {
 
   return {
     cleanup: () => {
+      console.log("GSAP cleanup runs");
       window.clearInterval(rotationTimer);
       cleanupGsapParallax?.();
       pendingTimers.forEach((timer) => window.clearTimeout(timer));
@@ -556,7 +548,12 @@ export default function MenuFixer() {
             const el = entry.target as HTMLElement;
             el.classList.add("hpc-animate--animated", "animate--animated");
             el.style.opacity = "1";
-            el.style.transform = "none";
+
+            // Only set transform: none for elements that are not part of the hero GSAP parallax
+            if (!el.closest("#hpc_col2")) {
+              el.style.transform = "none";
+            }
+
             animObserver.unobserve(el);
           }
         });
@@ -569,7 +566,7 @@ export default function MenuFixer() {
         ".hpc-animate, .animate:not(.animate--mobile-only), .hpc-slider__slide, .hpc-slider__layer",
       )
       .forEach((el) => {
-        (el as HTMLElement).style.opacity = "0";
+        // (el as HTMLElement).style.opacity = "0"; // DON'T HIDE
         animObserver.observe(el);
       });
 

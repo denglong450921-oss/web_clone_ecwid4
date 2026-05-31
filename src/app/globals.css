@@ -22,7 +22,7 @@
   --hero-col1-y-offset: -35px;
   --hero-col2-media-y-offset: -28px;
   --hero-col2-bg-left: -90.3vw;
-  --hero-col2-bg-right: 84vw;
+  --hero-col2-bg-right: 80vw;
   --hero-col2-bg-rotation: 30deg;
   --hero-parallax-col1-opacity: 0.96;
   --hero-phone-drift-offset: 0px;
@@ -64,52 +64,107 @@ a {
 .calypso-menu {
   position: sticky !important;
   top: 0 !important;
-  z-index: 9999 !important;
-  background: rgba(255, 255, 255, 0.92) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.07) !important;
-  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06) !important;
-  border-radius: 0 !important;
-  margin: 0 !important;
-  left: 0 !important;
-  max-width: 100% !important;
+  z-index: 1000000 !important;
+  background: #fff !important;
+  height: 80px !important;
   width: 100% !important;
+  display: block !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;
 }
 
-/* Fix the calypso-header wrapper so nav is at top */
-.calypso-header {
-  position: sticky;
-  top: 0;
-  z-index: 9999;
+.calypso-menu__inner {
+  max-width: 1200px !important;
+  width: 100% !important;
+  height: 80px !important;
+  padding: 0 24px !important;
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  margin: 0 auto !important;
+  font-family: "Montserrat", sans-serif !important;
 }
 
-/* ── Show all menu items ── */
-.calypso-menu .calypso-menu__item,
-.calypso-menu .calypso-menu__item--dropdown,
-.calypso-menu .calypso-menu__item--login {
+.calypso-menu__group {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.calypso-menu__item--logo {
+  padding: 19px 48px 0 0 !important;
+  height: 39px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+}
+
+.calypso-menu__logo {
+  height: 39px !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.calypso-menu__logo svg {
+  width: 106px !important;
+  height: auto !important;
+  display: block !important;
+}
+
+.calypso-menu__item {
+  display: flex !important;
+  align-items: center !important;
+}
+
+.calypso-menu__link {
+  font-size: 18px !important;
+  font-weight: 400 !important;
+  color: #0a0c0f !important;
+  padding: 20px 16px !important;
+  text-decoration: none !important;
   display: inline-block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-}
-
-.calypso-menu a.calypso-menu__link {
-  display: inline-block !important;
-  opacity: 1 !important;
-  visibility: visible !important;
-  color: var(--black) !important;
-  font-weight: 600 !important;
-  font-size: 15px !important;
   transition: color 0.2s ease !important;
+  font-family: "Montserrat", sans-serif !important;
 }
 
-.calypso-menu a.calypso-menu__link:hover {
-  color: #555 !important;
+.calypso-menu__link:hover {
+  color: #fae053 !important;
 }
 
-/* ── MOBILE HAMBURGER visible ── */
-.calypso-menu__item--mobile {
+.calypso-menu__item--cta .btn {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: #fff !important;
+  background: #000 !important;
+  padding: 6px 14px !important;
+  border-radius: 4px !important;
+  border: 2px solid #000 !important;
+  height: 30px !important;
+  line-height: 14px !important;
   display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.calypso-menu__item--login .calypso-menu__link {
+  padding: 20px 16px !important;
+}
+
+/* ── Mobile menu adjustments ── */
+.calypso-menu__group--mobile {
+  display: none !important;
+}
+
+@media (max-width: 1024px) {
+  .calypso-menu__inner {
+    padding: 0 24px !important;
+  }
+
+  .calypso-menu__group--1 .calypso-menu__item:not(.calypso-menu__item--logo),
+  .calypso-menu__group--2 {
+    display: none !important;
+  }
+
+  .calypso-menu__group--mobile {
+    display: flex !important;
+  }
 }
 
 /* ── Mobile menu overlay ── */
@@ -562,15 +617,31 @@ p {
   opacity: 1 !important;
 }
 
-/* ── REGISTER / sign-up page ── */
-.wj_registration,
-.cp-reg {
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #f7f7f8 0%, #e8e9ec 100%);
-  padding: 2rem;
+/* ── FOOTER ── */
+.calypso-page.footer {
+  background-color: #000 !important;
+  color: #fff !important;
+  padding: 80px 0 40px !important;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.footer-menu__section {
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  text-transform: uppercase !important;
+  margin-bottom: 24px !important;
+  color: #fff !important;
+  letter-spacing: 1px !important;
+}
+
+.calypso-page.footer a {
+  color: #cacaca !important;
+  font-size: 14px !important;
+  transition: color 0.2s ease !important;
+}
+
+.calypso-page.footer a:hover {
+  color: #fff !important;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -594,7 +665,6 @@ p {
 /* Collapse the dead space between menu and homepage hero */
 .calypso-block--EW19-tile-1:first-child,
 .calypso-viewport#tile-1 {
-  margin-top: 0 !important;
   padding-top: 2.5rem !important;
 }
 
@@ -703,45 +773,78 @@ section.calypso-block--background-menu {
   .index-EW19 #hpc_col2 .hpc-pics__tablet,
   .index-EW19 #hpc_col2 .hpc-tablet,
   .index-EW19 #hpc_col2 .hpc-pics__bg--second {
-    will-change: transform, rotate, opacity;
+    will-change: transform, rotate, opacity, left, right, top;
+    backface-visibility: hidden;
+    -webkit-font-smoothing: subpixel-antialiased;
   }
 
   .index-EW19 .container {
     width: 100% !important;
-    max-width: none !important;
-    margin: 0 !important;
-    padding-left: 72px !important;
-    padding-right: 72px !important;
+    max-width: 1200px !important;
+    margin: 0 auto !important;
+    padding-left: 24px !important;
+    padding-right: 24px !important;
   }
 
   .index-EW19 .calypso-block--EW19-tile-1 {
-    margin: 102px 0 0 !important;
-    padding: 0 !important;
-  }
-
-  .index-EW19
-    .page.calypso-page
-    > .calypso-viewport:first-child
-    > section
-    > .container,
-  .index-EW19 .page.calypso-page > section:first-child > .container,
-  .index-EW19 .calypso-viewport#tile-1 {
-    padding-top: 0 !important;
-  }
-
-  .index-EW19 .calypso-promo.calypso-promo--first-lg-b48 {
-    min-height: 663px !important;
-    padding: 0 !important;
-    align-items: normal !important;
+    margin: 102px 0 0;
+    padding: 0;
   }
 
   .index-EW19 #hpc_col1 {
     padding: 0 24px 48px !important;
-    transform: translate3d(0, var(--hero-col1-y-offset), 0);
+  }
+
+  .index-EW19 #hpc_col1 .hpc-text h1,
+  .index-EW19 #hpc_col1 .hpc-text h2 {
+    font-size: 64px !important;
+    line-height: 76.8px !important;
+    font-weight: 700 !important;
+    margin-bottom: 24px !important;
+    color: #000 !important;
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    font-family: "Montserrat", sans-serif !important;
+  }
+
+  .index-EW19 #hpc_col1 .hpc-text p {
+    font-size: 18px !important;
+    line-height: 27px !important;
+    color: rgb(10, 12, 15) !important;
+    margin-bottom: 0 !important;
+    opacity: 1 !important;
+    transform: none !important;
+    visibility: visible !important;
+    font-family: "Montserrat", sans-serif !important;
+  }
+
+  .index-EW19 #hpc_col1 .calypso-block__btn-block {
+    margin-top: 40px !important;
+  }
+
+  .index-EW19 #hpc_col1 .btn--large {
+    padding: 14px 38px 13px !important;
+    font-size: 18px !important;
+    background-color: #000 !important;
+    border-radius: 6px !important;
   }
 
   .index-EW19 #hpc_col1 .hpc-text {
     padding-top: 38px !important;
+  }
+
+  .index-EW19 #tile-3 h2 {
+    font-size: 48px !important;
+    font-weight: 700 !important;
+    font-family: "Montserrat", sans-serif !important;
+    margin-bottom: 24px !important;
+  }
+
+  .index-EW19 #tile-3 p {
+    font-size: 18px !important;
+    line-height: 27px !important;
+    font-family: "Montserrat", sans-serif !important;
   }
 
   .index-EW19 #hpc_col2 {
@@ -749,11 +852,13 @@ section.calypso-block--background-menu {
     padding: 0 24px !important;
     overflow: visible !important;
     transform: translate3d(0, var(--hero-col2-column-y-offset), 0);
+    transform-origin: center center;
   }
 
   .index-EW19 #hpc_col2 .hpc-pics--rotated {
     margin-top: -90px !important;
     margin-left: -50px !important;
+    transform: none !important;
   }
 
   .index-EW19 #hpc_col2 .hpc-pics--no-rotated {
@@ -763,13 +868,14 @@ section.calypso-block--background-menu {
 
   .index-EW19 #hpc_col2 .hpc-pics__phone,
   .index-EW19 #hpc_col2 .hpc-pics__tablet {
+    /* Keep base placement via top/left, translate3d is used for initial load offset */
     transform: translate3d(0, var(--hero-col2-media-y-offset), 0);
   }
 
   .index-EW19 #hpc_col2 .hpc-pics__bg--second {
-    left: var(--hero-col2-bg-left) !important;
-    right: var(--hero-col2-bg-right) !important;
-    transform: rotate(var(--hero-col2-bg-rotation)) !important;
+    left: var(--hero-col2-bg-left);
+    right: var(--hero-col2-bg-right);
+    transform: none !important;
   }
 }
 
@@ -779,10 +885,11 @@ section.calypso-block--background-menu {
   opacity: 0;
 }
 
-.index-EW19 #hpc_col1 .hpc-animate.hpc-animate--animated,
+/* Prevent CSS animations from fighting with GSAP once triggered */
 .index-EW19 #hpc_col2 .hpc-pics__phone.hpc-animate--animated,
 .index-EW19 #hpc_col2 .hpc-pics__tablet.hpc-animate--animated {
   opacity: 1 !important;
+  transform: none !important;
 }
 
 @keyframes hpcCol2SlideIn {

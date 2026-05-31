@@ -39,13 +39,146 @@ export default function RootLayout({
         />
 
         <style>{`
-          /* Critical above-fold styles — prevent FOUC */
+          /* Critical above-fold styles — prevent FOUC and force animations to final state */
           body { font-family: 'Open Sans', system-ui, sans-serif; margin: 0; overflow-x: hidden; }
           
+          /* Force all animated elements to be visible immediately and reset transforms */
+          .hpc-animate, 
+          .animate, 
+          .hpc-slider__slide, 
+          .hpc-pics__bg, 
+          .hpc-slider__layer,
+          .hpc-pics__phone,
+          .hpc-pics__tablet,
+          .hpc-pics__glasses,
+          .hpc-mobile-pics,
+          .hpc-phone__slide,
+          .hpc-tablet__slide,
+          .calypso-menu__link,
+          #hpc_on,
+          #hpc_sales_channel,
+          .hpc-text,
+          .hpc-underlined__text {
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: none !important;
+          }
+
+          /* Fix for h1 specifically */
+          h1.h1--EW19 {
+            opacity: 1 !important;
+            visibility: visible !important;
+            display: block !important;
+            transform: none !important;
+            font-size: 64px !important;
+            line-height: 1.1 !important;
+            font-weight: 800 !important;
+          }
+
+          /* Navigation Menu Fixes */
+          .calypso-menu__link, 
+          .calypso-menu__item span, 
+          .calypso-menu__item a {
+            color: #0a0c0f !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            text-decoration: none !important;
+          }
+
+          /* Underline Fixes — Brush Stroke Effect */
+          .hpc-underlined {
+            position: relative;
+            display: inline-block !important;
+          }
+          .hpc-underlined--yellow::after {
+            content: "";
+            position: absolute;
+            bottom: -2px;
+            left: -5%;
+            width: 110%;
+            height: 100%;
+            background: url("https://don16obqbay2c.cloudfront.net/wp-content/themes/ecwid/images/hpc/zh-CN/svg_illustrations/hero-line-yellow.svg") no-repeat center bottom;
+            background-size: 100% auto;
+            z-index: -1;
+            opacity: 1 !important;
+            visibility: visible !important;
+            transform: rotate(-1deg);
+          }
+          .hpc-underlined__text {
+            position: relative;
+            z-index: 1;
+            display: inline-block !important;
+          }
+
+          /* Header CTA button fix */
+          .cta-signup.btn--small {
+            background-color: #fae053 !important;
+            color: #0a0c0f !important;
+            padding: 8px 24px !important;
+            border-radius: 4px !important;
+            font-weight: 700 !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+          }
+
+          /* Specific fixes for overlapping layers and missing images */
+          .hpc-slider__layer--2 {
+            display: none !important;
+          }
+
+          #hpc_pics {
+            margin-top: 110px !important; /* Adjusted from -90px to match live site better */
+            opacity: 1 !important;
+            visibility: visible !important;
+          }
+
+          .hpc-pics__bg {
+            opacity: 1 !important;
+            visibility: visible !important;
+          }
+
+          /* Fix for the missing Start Selling header text */
+          #home-68 {
+            display: block !important;
+            opacity: 1 !important;
+            visibility: visible !important;
+            font-size: 64px !important;
+            font-weight: 800 !important;
+            line-height: 1.1 !important;
+            margin-bottom: 8px !important;
+          }
+
+          /* Hero text positioning */
+          .hpc-text {
+            padding-top: 120px !important;
+          }
+
+          /* Image sizing fixes */
+          .hpc-phone__image, .hpc-tablet__image {
+            width: 100% !important;
+            height: auto !important;
+            display: block !important;
+          }
+
+          /* Ensure frames are visible */
+          .hpc-phone__frame, .hpc-tablet__frame {
+            opacity: 1 !important;
+            visibility: visible !important;
+          }
+
+          /* Force lazyloaded images */
           .lazyload, .lazyloading, .lazy-load {
             opacity: 1 !important;
             transform: none !important;
             visibility: visible !important;
+          }
+
+          /* Fix missing backgrounds */
+          .calypso-no-bg-loaded {
+            background-image: inherit !important;
           }
 
           .wj_registration-overlay { z-index: 1000000000 !important; }

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hero Rotation Mockup - Huashu Design</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background: #f7f7f8;
+            font-family: system-ui, -apple-system, sans-serif;
+            overflow: hidden;
+        }
+        .hero-container {
+            width: 1440px;
+            height: 800px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            margin: 40px auto;
+            border-radius: 12px;
+        }
+        .hpc-col2 {
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 800px;
+            height: 600px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform-origin: center center;
+        }
+        .bg-plane {
+            position: absolute;
+            width: 1200px;
+            height: 1000px;
+            background: #fae053;
+            z-index: 1;
+        }
+        .media-stack {
+            position: relative;
+            z-index: 2;
+            width: 600px;
+            height: 400px;
+        }
+        .tablet {
+            position: absolute;
+            width: 450px;
+            height: 320px;
+            background: #333;
+            border-radius: 20px;
+            right: 0;
+            bottom: 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border: 8px solid #000;
+        }
+        .phone {
+            position: absolute;
+            width: 140px;
+            height: 280px;
+            background: #222;
+            border-radius: 18px;
+            left: 50px;
+            top: 50px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+            border: 6px solid #000;
+            z-index: 3;
+        }
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255,255,255,0.9);
+            padding: 20px 40px;
+            border-radius: 100px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        input[type=range] {
+            width: 300px;
+        }
+        .label {
+            font-weight: 600;
+            color: #515258;
+            font-size: 14px;
+        }
+        .indicator {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: #000;
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            z-index: 100;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        function RotationMockup() {
+            const [progress, setProgress] = useState(0);
+            const col2Ref = useRef(null);
+            const bgRef = useRef(null);
+            const phoneRef = useRef(null);
+            const tabletRef = useRef(null);
+
+            // 初始状态 (Initial Tilted State)
+            const START_ROTATION = 30; // 对应原本的 --hero-col2-bg-rotation
+            const END_ROTATION = 0;   // 水平状态
+
+            useEffect(() => {
+                const rotation = START_ROTATION + (END_ROTATION - START_ROTATION) * progress;
+                const xShift = progress * 150; // 向右平移一点增加“展开感”
+                
+                // 整体旋转 (Rotate Left to Horizontal)
+                gsap.set(col2Ref.current, {
+                    rotate: progress * -5, // col2 本身轻微转动
+                    x: xShift,
+                });
+
+                // 背景平面旋转 (Bg Plane rotates back to 0)
+                gsap.set(bgRef.current, {
+                    rotate: START_ROTATION - (progress * START_ROTATION),
+                });
+
+                // 手机和平板的差异化位移 (Parallax)
+                gsap.set(phoneRef.current, {
+                    x: progress * 80,
+                    y: progress * -20,
+                    rotate: progress * -10, // 手机也转正一点
+                });
+
+                gsap.set(tabletRef.current, {
+                    x: progress * 40,
+                    y: progress * 10,
+                });
+
+            }, [progress]);
+
+            return (
+                <div className="hero-container">
+                    <div className="indicator">
+                        Progress: {(progress * 100).toFixed(0)}% | 
+                        Current BG Rotation: {(START_ROTATION - progress * START_ROTATION).toFixed(1)}deg
+                    </div>
+
+                    <div className="hpc-col2" ref={col2Ref}>
+                        <div className="bg-plane" ref={bgRef}></div>
+                        <div className="media-stack">
+                            <div className="tablet" ref={tabletRef}>
+                                <div className="p-4 text-white font-bold opacity-20">Tablet Content</div>
+                            </div>
+                            <div className="phone" ref={phoneRef}>
+                                <div className="h-full w-full flex items-center justify-center">
+                                    <div className="w-10 h-1 bg-white/20 rounded"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="controls">
+                        <span className="label">滚动模拟 (Scroll)</span>
+                        <input 
+                            type="range" 
+                            min="0" 
+                            max="1" 
+                            step="0.001" 
+                            value={progress} 
+                            onChange={(e) => setProgress(parseFloat(e.target.value))}
+                        />
+                        <span className="label">{progress === 0 ? "初始 (Tilted)" : progress === 1 ? "完成 (Horizontal)" : "进行中..."}</span>
+                    </div>
+
+                    <div className="absolute top-1/2 left-20 -translate-y-1/2 w-80">
+                        <h1 className="text-5xl font-bold mb-4">hpc_col1</h1>
+                        <p className="text-gray-500 text-lg">文字内容保持相对固定...</p>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<RotationMockup />);
+    </script>
+</body>
+</html>
